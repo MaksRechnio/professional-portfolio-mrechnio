@@ -12,6 +12,18 @@ body {
     font-weight: 400;
 }
 
+/* Background Animation Canvas */
+.background-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0; /* Underneath major elements */
+    pointer-events: none; /* Don't interfere with mouse events */
+    background: transparent;
+}
+
 .container {
     position: relative;
     width: 100vw;
