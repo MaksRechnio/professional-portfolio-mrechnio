@@ -26,6 +26,10 @@ let time = 0;
 let lastMouseTime = 0;
 let lastMousePos = new THREE.Vector2(0.5, 0.5);
 
+// Global mouse position for picture and text movement
+let globalMouseX = 0.5;
+let globalMouseY = 0.5;
+
 const textureLoader = new THREE.TextureLoader();
 let profileTexture;
 let shaderMaterial;
@@ -37,8 +41,8 @@ function calculateRevealRadius() {
     const containerRect = container.getBoundingClientRect();
     // Use width for horizontal, height for vertical - use the smaller to ensure it fits
     const minDimension = Math.min(containerRect.width, containerRect.height);
-    // 100px wide = 50px radius
-    revealRadiusNormalized = (50.0) / minDimension;
+    // 160px wide = 80px radius
+    revealRadiusNormalized = (80.0) / minDimension;
     console.log('Reveal radius:', revealRadiusNormalized, 'for 100px width, container:', containerRect.width, 'x', containerRect.height);
 }
 
@@ -283,6 +287,11 @@ function createShaderMaterial() {
         void main() {
             vec4 profileColor = texture2D(profileTexture, vUv);
             
+            // Reduce saturation by 10%
+            float luminance = dot(profileColor.rgb, vec3(0.299, 0.587, 0.114)); // Convert to grayscale
+            vec3 desaturatedColor = mix(profileColor.rgb, vec3(luminance), 0.1); // Mix with grayscale (10% reduction)
+            profileColor.rgb = desaturatedColor;
+            
             // Create iOS-style blurred shadow (always rendered first)
             float shadowAlpha = createShadow(vUv);
             vec4 shadowLayer = vec4(0.0, 0.0, 0.0, shadowAlpha);
@@ -460,19 +469,8 @@ function onMouseMove(event) {
         }
     }
     
-    // Update target positions for smooth interpolation
-    if (window.interactiveMesh && isHovering) {
-        const normalizedX = (x - 0.5) * 2.0; // -1 to 1
-        const normalizedY = (y - 0.5) * 2.0; // -1 to 1
-        
-        // Vertical movement: cursor up/down = picture moves up/down (increased movement range)
-        const verticalOffset = normalizedY * 0.015; // Increased vertical movement (works both up and down)
-        window.targetMeshY = window.baseMeshY + verticalOffset;
-        
-        // Slight horizontal movement
-        const horizontalOffset = normalizedX * 0.005;
-        window.targetMeshX = window.baseMeshX + horizontalOffset;
-    }
+    // Note: Picture movement is now handled in animate() using globalMouseX/Y
+    // This onMouseMove function only handles fluid trail for the picture
     
     // Update trail
     updateMouseTrail(x, y);
@@ -577,9 +575,22 @@ function animate() {
         }
     }
 
-    // Smoothly interpolate mesh position for interactive movement
-    if (window.interactiveMesh) {
-        const lerpFactor = 0.03; // Slower interpolation for more delayed movement
+    // Smoothly interpolate mesh position for interactive movement (with slight delay)
+    // Update picture position based on global mouse position
+    if (window.interactiveMesh && typeof window.baseMeshY !== 'undefined' && typeof window.baseMeshX !== 'undefined') {
+        // Use global mouse position for picture movement
+        const normalizedX = (globalMouseX - 0.5) * 2.0; // -1 to 1
+        const normalizedY = (globalMouseY - 0.5) * 2.0; // -1 to 1
+        
+        // Calculate target position (increased movement, inverted Y for correct direction)
+        const verticalOffset = -normalizedY * 0.005; // Inverted Y so cursor up = picture up
+        const horizontalOffset = normalizedX * 0.003; // Increased from 0.001
+        
+        window.targetMeshY = window.baseMeshY + verticalOffset;
+        window.targetMeshX = window.baseMeshX + horizontalOffset;
+        
+        // Smooth interpolation
+        const lerpFactor = 0.025; // Slight delay for smooth movement
         window.interactiveMesh.position.y = THREE.MathUtils.lerp(window.interactiveMesh.position.y, window.targetMeshY, lerpFactor);
         window.interactiveMesh.position.x = THREE.MathUtils.lerp(window.interactiveMesh.position.x, window.targetMeshX, lerpFactor);
     }
@@ -654,6 +665,121 @@ window.addEventListener('resize', () => {
         shaderMaterial.uniforms.revealRadius.value = revealRadiusNormalized;
     }
 });
+
+// Interactive text movement (same as picture)
+const textElements = [];
+// globalMouseX and globalMouseY are now defined at the top of the file
+
+function initInteractiveText() {
+    // Get all text elements except navbar
+    const selectors = [
+        '.greeting',
+        '.intro',
+        '.stat-number',
+        '.stat-label',
+        '.stats-section',
+        '.greeting-section'
+    ];
+    
+    selectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+            // Exclude navbar elements
+            if (!element.closest('.header') && !element.closest('.nav') && !element.classList.contains('nav-link') && !element.classList.contains('cta-button')) {
+                // Get element position to calculate delay (elements further down get more delay)
+                const rect = element.getBoundingClientRect();
+                const elementTop = rect.top;
+                const viewportHeight = window.innerHeight;
+                // Calculate delay based on position: 0 at top, increases as we go down
+                // Delay ranges from 0 to ~0.1 seconds (100ms) for elements at bottom
+                const delayFactor = Math.min(elementTop / viewportHeight, 1.0) * 0.1;
+                
+                // Store initial position (relative to viewport center)
+                textElements.push({
+                    element: element,
+                    offsetX: 0,
+                    offsetY: 0,
+                    targetOffsetX: 0,
+                    targetOffsetY: 0,
+                    delay: delayFactor, // Delay factor based on position
+                    delayedTargetX: 0,
+                    delayedTargetY: 0,
+                    delayLerpSpeed: 0.05 + delayFactor * 0.1 // Slower lerp for elements further down
+                });
+            }
+        });
+    });
+}
+
+function updateTextMovement() {
+    // Normalize mouse position (0 to 1)
+    const normalizedX = (globalMouseX - 0.5) * 2.0; // -1 to 1
+    const normalizedY = (globalMouseY - 0.5) * 2.0; // -1 to 1
+    
+    // Update target offsets for all text elements (in pixels)
+    // Slightly decreased vertically
+    const verticalOffset = normalizedY * 1.2; // Slightly decreased (was 1.5, now 1.2)
+    const horizontalOffset = normalizedX * 1; // Further reduced (was 2, now 1)
+    
+    textElements.forEach(item => {
+        item.targetOffsetY = verticalOffset;
+        item.targetOffsetX = horizontalOffset;
+    });
+}
+
+// Simple lerp function (in case THREE is not available)
+function lerp(start, end, factor) {
+    return start + (end - start) * factor;
+}
+
+function animateTextElements() {
+    const lerpFactor = 0.03; // Same as picture
+    
+    textElements.forEach(item => {
+        // Apply delay: smoothly move delayed target towards actual target
+        // Elements further down have slower delay lerp (more delay)
+        item.delayedTargetY = lerp(item.delayedTargetY, item.targetOffsetY, item.delayLerpSpeed);
+        item.delayedTargetX = lerp(item.delayedTargetX, item.targetOffsetX, item.delayLerpSpeed);
+        
+        // Smoothly interpolate offset towards delayed target
+        item.offsetY = lerp(item.offsetY, item.delayedTargetY, lerpFactor);
+        item.offsetX = lerp(item.offsetX, item.delayedTargetX, lerpFactor);
+        
+        // Apply transform
+        item.element.style.transform = `translate(${item.offsetX}px, ${item.offsetY}px)`;
+    });
+    
+    requestAnimationFrame(animateTextElements);
+}
+
+// Global mouse move handler for picture and text movement
+function onGlobalMouseMove(event) {
+    // Normalize to viewport (0 to 1)
+    globalMouseX = event.clientX / window.innerWidth;
+    globalMouseY = event.clientY / window.innerHeight;
+    
+    // Update text movement
+    updateTextMovement();
+    
+    // Picture movement is handled in animate() function using globalMouseX/Y
+}
+
+// Initialize text movement after DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            initInteractiveText();
+            animateTextElements();
+        }, 100);
+    });
+} else {
+    setTimeout(() => {
+        initInteractiveText();
+        animateTextElements();
+    }, 100);
+}
+
+window.addEventListener('mousemove', onGlobalMouseMove);
 
 initTextures();
 animate();

@@ -261,6 +261,7 @@ class BackgroundAnimation {
         this.ctx = this.canvas.getContext('2d');
         this.elements = [];
         this.contentBounds = [];
+        this.allowedArea = null; // Area where elements can spawn (underneath texts)
         
         this.resize();
         window.addEventListener('resize', () => this.resize());
@@ -396,20 +397,51 @@ class BackgroundAnimation {
                 height: rect.height + 60
             });
         });
+        
+        // Define allowed spawn area (underneath texts only)
+        // Get main content area
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) {
+            const rect = mainContent.getBoundingClientRect();
+            // Store allowed area for spawning
+            this.allowedArea = {
+                x: rect.left,
+                y: rect.top + rect.height, // Start below the text content
+                width: rect.width,
+                height: window.innerHeight - (rect.top + rect.height) // Rest of viewport height
+            };
+        } else {
+            // Fallback: use entire viewport
+            this.allowedArea = {
+                x: 0,
+                y: 0,
+                width: window.innerWidth,
+                height: window.innerHeight
+            };
+        }
     }
     
     trySpawnElement() {
         // Try to spawn a new element
         const maxAttempts = 100; // Increased attempts
         
-        // Limit to viewport dimensions (visible area only)
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
+        // Use allowed area (underneath texts) if defined, otherwise use viewport
+        let spawnArea;
+        if (this.allowedArea && this.allowedArea.height > 0) {
+            spawnArea = this.allowedArea;
+        } else {
+            spawnArea = {
+                x: 0,
+                y: 0,
+                width: window.innerWidth,
+                height: window.innerHeight
+            };
+        }
         
         for (let attempt = 0; attempt < maxAttempts; attempt++) {
-            // Random position within viewport only
-            const x = Math.random() * viewportWidth;
-            const y = Math.random() * viewportHeight;
+            // Random position within allowed area only (underneath texts)
+            const x = spawnArea.x + Math.random() * spawnArea.width;
+            const y = spawnArea.y + Math.random() * spawnArea.height;
             
             // Random lengths (70px to 230px)
             const length1 = 70 + Math.random() * 160;
