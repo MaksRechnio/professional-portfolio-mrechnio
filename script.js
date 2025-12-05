@@ -99,8 +99,8 @@ function createShaderMaterial() {
 
         // Generate dense animated dots with flow movement (white and black)
         vec3 animatedDots(vec2 uv) {
-            // Less dense grid for bigger dots
-            float dotSpacing = 4.0;
+            // More dense grid for more dots
+            float dotSpacing = 2.0;
             vec2 grid = floor(uv * resolution / dotSpacing);
             vec2 gridUV = fract(uv * resolution / dotSpacing);
             
@@ -132,12 +132,12 @@ function createShaderMaterial() {
             float pulse = sin(time * 2.5 + random(grid) * 6.28) * 0.5 + 0.5;
             float fade = smoothstep(0.2, 0.8, pulse);
             
-            // Create bigger dot shape (2x bigger)
+            // Create dot shape with specified size
             float dist = length(animatedPos);
-            float dot = smoothstep(0.5, 0.20, dist) * fade; // 2x bigger dots
+            float dot = smoothstep(0.25, 0.13, dist) * fade; // Smaller dots (0.25, 0.13)
             
-            // Randomly show/hide dots for flow effect
-            float visibility = step(0.2, random(grid + time * 0.1));
+            // Randomly show/hide dots for flow effect (more dots visible)
+            float visibility = step(0.15, random(grid + time * 0.1)); // Lower threshold = more visible
             dot *= visibility;
             
             // Alternate between white and black dots
@@ -311,13 +311,13 @@ function createShaderMaterial() {
                     // Generate animated dots (white and black)
                     vec3 dots = animatedDots(vUv);
                     
-                    // Background color (#0C042D = rgb(12, 4, 45))
+                    // Background color (#0C042D = rgb(12, 4, 45)) with 30% opacity
                     vec3 bgColor = vec3(12.0/255.0, 4.0/255.0, 45.0/255.0);
                     
                     // Mix background with dots - dots already contain their colors
                     float dotIntensity = length(dots);
                     vec3 fluidRGB = mix(bgColor, dots, dotIntensity);
-                    float fluidAlpha = profileColor.a * strokeMask;
+                    float fluidAlpha = profileColor.a * strokeMask * 0.3; // 30% opacity
                     
                     // Composite layers: shadow (base) + fluid (on top)
                     // Shadow stays visible by compositing fluid on top of shadow
