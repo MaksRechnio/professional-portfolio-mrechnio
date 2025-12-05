@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maksymilian Rechnio - UX/UI Designer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <img src="white-plus-icon.png" alt="+" class="plus-sign">
+            <nav class="nav">
+                <a href="#" class="nav-link active">About Me</a>
+                <a href="#" class="nav-link">Portfolio</a>
+                <a href="#" class="nav-link">Services</a>
+                <a href="#" class="nav-link">Blog</a>
+            </nav>
+            <a href="#" class="cta-button">Book a call</a>
+        </header>
+
+        <!-- Vertical Line with Labels -->
+        <div class="vertical-line-segment line-top"></div>
+        <div class="vertical-label ux-label">UX / UI Designer</div>
+        <div class="vertical-line-segment line-middle"></div>
+        <div class="vertical-label year-label">2025</div>
+        <div class="vertical-line-segment line-bottom"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Stats Section -->
+            <div class="stats-section">
+                <div class="stat">
+                    <div class="stat-number">400+</div>
+                    <div class="stat-label">Leads generated</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">5+</div>
+                    <div class="stat-label">Client Projects completed</div>
+                </div>
+            </div>
+
+            <!-- Greeting Section -->
+            <div class="greeting-section">
+                <h1 class="greeting">Hey!</h1>
+                <p class="intro">-a <span class="intro-bold">startup</span> guy,<br><span class="intro-name">Maksymilian <span class="intro-medium">Rechnio</span></span></p>
+            </div>
+        </main>
+
+        <!-- Three.js Canvas Container -->
+        <div class="canvas-container" id="canvas-container"></div>
+    </div>
+
+    <!-- Three.js Library -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
+
