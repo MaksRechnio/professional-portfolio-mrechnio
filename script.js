@@ -259,29 +259,91 @@ function createShaderMaterial() {
             return minDist;
         }
 
-        // Create iOS-style blurred shadow
+        // Create enhanced 3D shadow with multiple layers on both sides
         float createShadow(vec2 uv) {
-            vec2 shadowOffset = vec2(0.015, -0.005); // Rightward and slightly up (iOS style)
+            vec2 shadowOffsetRight = vec2(0.025, -0.008); // Rightward and slightly up (main light from left)
+            vec2 shadowOffsetLeft = vec2(-0.015, -0.005); // Leftward and slightly up (secondary light from right)
             float shadowIntensity = 0.0;
             
-            // Sample multiple points for blur/distortion (iOS shadow effect)
-            int samples = 9;
-            float blurRadius = 0.008; // Blur amount
+            // RIGHT SIDE SHADOWS (main shadow)
+            // Layer 1: Close shadow (sharp, dark)
+            int samples1 = 9;
+            float blurRadius1 = 0.006; // Tighter blur for close shadow
+            float layer1Intensity = 0.0;
             
             for (int x = -1; x <= 1; x++) {
                 for (int y = -1; y <= 1; y++) {
-                    vec2 sampleOffset = shadowOffset + vec2(float(x), float(y)) * blurRadius;
+                    vec2 sampleOffset = shadowOffsetRight * 0.6 + vec2(float(x), float(y)) * blurRadius1;
                     vec4 shadowSample = texture2D(profileTexture, uv + sampleOffset);
-                    
-                    // Weighted contribution (center samples contribute more)
                     float weight = 1.0 - length(vec2(float(x), float(y))) * 0.3;
-                    shadowIntensity += shadowSample.a * weight;
+                    layer1Intensity += shadowSample.a * weight;
                 }
             }
+            layer1Intensity /= float(samples1);
             
-            // Average and apply opacity
-            shadowIntensity /= float(samples);
-            return shadowIntensity * 0.5; // 50% opacity for nice iOS-like shadow
+            // Layer 2: Mid shadow (medium blur)
+            int samples2 = 25;
+            float blurRadius2 = 0.012; // Medium blur
+            float layer2Intensity = 0.0;
+            
+            for (int x = -2; x <= 2; x++) {
+                for (int y = -2; y <= 2; y++) {
+                    vec2 sampleOffset = shadowOffsetRight * 0.8 + vec2(float(x), float(y)) * blurRadius2;
+                    vec4 shadowSample = texture2D(profileTexture, uv + sampleOffset);
+                    float weight = 1.0 - length(vec2(float(x), float(y))) * 0.2;
+                    layer2Intensity += shadowSample.a * weight;
+                }
+            }
+            layer2Intensity /= float(samples2);
+            
+            // Layer 3: Far shadow (large blur, soft)
+            int samples3 = 25;
+            float blurRadius3 = 0.020; // Large blur for soft shadow
+            float layer3Intensity = 0.0;
+            
+            for (int x = -2; x <= 2; x++) {
+                for (int y = -2; y <= 2; y++) {
+                    vec2 sampleOffset = shadowOffsetRight * 1.0 + vec2(float(x), float(y)) * blurRadius3;
+                    vec4 shadowSample = texture2D(profileTexture, uv + sampleOffset);
+                    float weight = 1.0 - length(vec2(float(x), float(y))) * 0.15;
+                    layer3Intensity += shadowSample.a * weight;
+                }
+            }
+            layer3Intensity /= float(samples3);
+            
+            // LEFT SIDE SHADOWS (secondary shadow for depth)
+            // Layer 4: Left side shadow (softer, less intense)
+            float layer4Intensity = 0.0;
+            
+            for (int x = -1; x <= 1; x++) {
+                for (int y = -1; y <= 1; y++) {
+                    vec2 sampleOffset = shadowOffsetLeft * 0.7 + vec2(float(x), float(y)) * blurRadius2;
+                    vec4 shadowSample = texture2D(profileTexture, uv + sampleOffset);
+                    float weight = 1.0 - length(vec2(float(x), float(y))) * 0.3;
+                    layer4Intensity += shadowSample.a * weight;
+                }
+            }
+            layer4Intensity /= float(samples1);
+            
+            // Layer 5: Left side far shadow (very soft)
+            float layer5Intensity = 0.0;
+            
+            for (int x = -2; x <= 2; x++) {
+                for (int y = -2; y <= 2; y++) {
+                    vec2 sampleOffset = shadowOffsetLeft * 1.0 + vec2(float(x), float(y)) * blurRadius3;
+                    vec4 shadowSample = texture2D(profileTexture, uv + sampleOffset);
+                    float weight = 1.0 - length(vec2(float(x), float(y))) * 0.15;
+                    layer5Intensity += shadowSample.a * weight;
+                }
+            }
+            layer5Intensity /= float(samples2);
+            
+            // Combine layers with different opacities for depth
+            // Right side shadows (stronger) + Left side shadows (softer)
+            shadowIntensity = layer1Intensity * 0.6 + layer2Intensity * 0.3 + layer3Intensity * 0.2 + 
+                             layer4Intensity * 0.15 + layer5Intensity * 0.1;
+            
+            return shadowIntensity * 0.7; // Overall shadow intensity
         }
 
         void main() {

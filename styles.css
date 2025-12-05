@@ -182,11 +182,31 @@ body {
 }
 
 .greeting {
-    font-size: 210px;
+    font-size: 190px;
     font-weight: 300;
     line-height: normal;
     margin-bottom: 20px;
     color: #F2F2F0;
+    position: relative;
+    display: inline-block;
+}
+
+.greeting-letter {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: letterAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes letterAppear {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .intro {
@@ -226,7 +246,7 @@ body {
 /* Responsive Design */
 @media (max-width: 1200px) {
     .greeting {
-        font-size: 150px;
+        font-size: 135px;
     }
     
     .canvas-container {
@@ -262,7 +282,7 @@ body {
     }
     
     .greeting {
-        font-size: 100px;
+        font-size: 90px;
     }
     
     .canvas-container {
