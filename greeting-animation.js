@@ -1,7 +1,7 @@
 // Letter-by-Letter Reveal Animation
 // Letters appear one by one quickly to form the new word
 
-const greetings = ["Hey!", "Cześć!", "Hoi!", "¡Hola!"];
+const greetings = ["Hey!", "Cześć!", "Hoi!"];
 let currentIndex = 0;
 let isAnimating = false;
 let animationTimeout = null;
@@ -16,7 +16,7 @@ function initGreetingAnimation() {
     // Start the cycle
     animationTimeout = setTimeout(() => {
         cycleGreeting();
-    }, 7000); // First change after 7 seconds
+    }, 10000); // First change after 10 seconds
 }
 
 function displayTextWithAnimation(element, text) {
@@ -54,8 +54,9 @@ function cycleGreeting() {
     // Display new text with letter-by-letter animation
     displayTextWithAnimation(greetingElement, newText);
     
-    // Calculate total animation duration (number of letters * delay + animation duration)
-    const animationDuration = newText.length * 80 + 400; // 80ms delay + 400ms animation
+    // Calculate total animation duration
+    // Last letter starts at (length - 1) * 80ms, then takes 400ms to animate
+    const animationDuration = (newText.length - 1) * 80 + 400; // Correct: last letter delay + animation duration
     
     // After animation completes, schedule next change
     setTimeout(() => {
@@ -64,7 +65,7 @@ function cycleGreeting() {
         // Schedule next change
         animationTimeout = setTimeout(() => {
             cycleGreeting();
-        }, 7000); // Change every 7 seconds
+        }, 10000); // Change every 10 seconds
     }, animationDuration);
 }
 

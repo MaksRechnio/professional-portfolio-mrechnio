@@ -41,8 +41,8 @@ function calculateRevealRadius() {
     const containerRect = container.getBoundingClientRect();
     // Use width for horizontal, height for vertical - use the smaller to ensure it fits
     const minDimension = Math.min(containerRect.width, containerRect.height);
-    // 160px wide = 80px radius
-    revealRadiusNormalized = (80.0) / minDimension;
+    // 140px wide = 70px radius (decreased from 80px)
+    revealRadiusNormalized = (70.0) / minDimension;
     console.log('Reveal radius:', revealRadiusNormalized, 'for 100px width, container:', containerRect.width, 'x', containerRect.height);
 }
 
@@ -434,13 +434,13 @@ function createShaderMaterial() {
     });
 
     // Make picture bigger - scale geometry
-    const geometry = new THREE.PlaneGeometry(2.5, 2.5); // Reduced by half
+    const geometry = new THREE.PlaneGeometry(2.65, 2.65); /* Increased from 2.5 to make picture bigger */
     
     const mesh = new THREE.Mesh(geometry, shaderMaterial);
     
     // Base position
-    const baseY = 0.28;
-    const baseX = -0.1;
+    const baseY = 0.20; /* Lowered from 0.28 to move picture down */
+    const baseX = -0.0;
     mesh.position.y = baseY;
     mesh.position.x = baseX;
     

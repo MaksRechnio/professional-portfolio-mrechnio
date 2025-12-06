@@ -42,6 +42,16 @@ body {
     margin-left: 120px;
 }
 
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: fixed;
+    top: 40px;
+    right: 40px;
+    z-index: 100;
+}
+
 .plus-sign {
     width: 44px;
     height: 44px;
@@ -56,42 +66,251 @@ body {
     padding: 0;
 }
 
-.nav {
+/* Hamburger Menu */
+.hamburger-menu {
+    background-color: #FF6B5C;
+    border: none;
+    border-radius: 4px; /* Small border radius */
+    cursor: pointer;
     display: flex;
-    gap: 40px;
-    margin-left: 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    padding: 12px; /* Square button padding */
+    width: 48px; /* Square dimensions */
+    height: 48px;
+    z-index: 101; /* Higher than navbar to stay on top */
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    
+    /* Multi-layer shadowing for depth */
+    box-shadow: 
+        0 2px 4px rgba(255, 107, 92, 0.3),
+        0 4px 8px rgba(255, 107, 92, 0.2),
+        0 8px 16px rgba(0, 0, 0, 0.15),
+        0 12px 24px rgba(0, 0, 0, 0.1);
 }
 
-.nav-link {
-    text-decoration: none;
-    color: #F2F2F0;
-    font-size: 16px;
-    font-weight: 400;
-    transition: font-weight 0.2s;
+.hamburger-menu:hover {
+    background-color: #ff5a4a;
+    transform: translateY(-4px) scale(1.1) rotate(5deg);
+    
+    /* Enhanced shadow on hover */
+    box-shadow: 
+        0 4px 8px rgba(255, 107, 92, 0.4),
+        0 8px 16px rgba(255, 107, 92, 0.3),
+        0 16px 32px rgba(0, 0, 0, 0.2),
+        0 24px 48px rgba(0, 0, 0, 0.15),
+        0 0 20px rgba(255, 107, 92, 0.5); /* Glow effect */
+    
+    animation: crazyHover 0.6s ease-in-out infinite alternate;
 }
 
-.nav-link.active {
-    font-weight: 600;
+/* Crazy hover animation */
+@keyframes crazyHover {
+    0% {
+        transform: translateY(-4px) scale(1.1) rotate(5deg);
+    }
+    25% {
+        transform: translateY(-6px) scale(1.12) rotate(-3deg);
+    }
+    50% {
+        transform: translateY(-4px) scale(1.1) rotate(5deg);
+    }
+    75% {
+        transform: translateY(-6px) scale(1.12) rotate(-3deg);
+    }
+    100% {
+        transform: translateY(-4px) scale(1.1) rotate(5deg);
+    }
 }
 
-.nav-link:hover {
-    font-weight: 600;
+.hamburger-menu span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background-color: #FFFFFF; /* White lines on colored background */
+    transition: all 0.3s ease;
+    border-radius: 1px;
 }
 
-.cta-button {
-    text-decoration: none;
-    color: #F2F2F0;
-    font-size: 16px;
-    font-weight: 400;
-    padding: 8px 20px;
-    border: 1px solid #F2F2F0;
-    transition: background-color 0.2s, color 0.2s;
+.hamburger-menu:hover span {
+    transform: scaleX(1.2);
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.6);
 }
 
-.cta-button:hover {
+.hamburger-menu:hover span:nth-child(1) {
+    animation: linePulse 0.6s ease-in-out infinite;
+    animation-delay: 0s;
+}
+
+.hamburger-menu:hover span:nth-child(2) {
+    animation: linePulse 0.6s ease-in-out infinite;
+    animation-delay: 0.2s;
+}
+
+.hamburger-menu:hover span:nth-child(3) {
+    animation: linePulse 0.6s ease-in-out infinite;
+    animation-delay: 0.4s;
+}
+
+@keyframes linePulse {
+    0%, 100% {
+        transform: scaleX(1.2);
+        opacity: 1;
+    }
+    50% {
+        transform: scaleX(1.4);
+        opacity: 0.8;
+    }
+}
+
+.hamburger-menu.active {
+    background-color: #FF6B5C; /* Keep same color when active */
+}
+
+.hamburger-menu.active span {
+    background-color: #003C46; /* Dark color when menu is open (visible on white navbar) */
+}
+
+.hamburger-menu.active span:nth-child(1) {
+    transform: rotate(45deg) translate(7px, 7px);
+}
+
+.hamburger-menu.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-menu.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* Vertical Navbar */
+.vertical-navbar {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: calc(50% + 50px); /* Picture width (50%) + 50px */
+    height: 100vh;
     background-color: #F2F2F0;
-    color: #003C46;
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding-left: 80px;
+    transition: right 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
 }
+
+/* Close Menu Button */
+.close-menu {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 102;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.vertical-navbar.open .close-menu {
+    opacity: 1;
+    transform: scale(1);
+    transition-delay: 0.2s;
+    pointer-events: auto;
+}
+
+.close-menu span {
+    position: absolute;
+    width: 28px;
+    height: 2px;
+    background-color: #003C46;
+    transition: all 0.3s ease;
+}
+
+.close-menu span:nth-child(1) {
+    transform: rotate(45deg);
+}
+
+.close-menu span:nth-child(2) {
+    transform: rotate(-45deg);
+}
+
+.close-menu:hover span {
+    background-color: #003C46;
+    opacity: 0.7;
+}
+
+.vertical-navbar.open {
+    right: 0;
+}
+
+.vertical-nav-link {
+    text-decoration: none;
+    color: #003C46;
+    font-size: 72px; /* 3x larger (was 24px) */
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    display: inline-block;
+    position: relative;
+}
+
+/* Minimalistic fade-in/type-out animation */
+@keyframes fadeInTypeOut {
+    0% {
+        opacity: 0;
+        transform: translateX(-20px);
+        clip-path: inset(0 100% 0 0);
+    }
+    50% {
+        opacity: 0.5;
+        transform: translateX(-10px);
+        clip-path: inset(0 50% 0 0);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+        clip-path: inset(0 0% 0 0);
+    }
+}
+
+.vertical-navbar.open .vertical-nav-link {
+    opacity: 1;
+    animation: fadeInTypeOut 0.6s ease-out forwards;
+}
+
+.vertical-navbar.open .vertical-nav-link:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.vertical-navbar.open .vertical-nav-link:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.vertical-navbar.open .vertical-nav-link:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+.vertical-nav-link:hover {
+    font-weight: 600;
+}
+
 
 /* Vertical Line Segments */
 .vertical-line-segment {
@@ -107,19 +326,20 @@ body {
 }
 
 .line-top {
-    top: 110px; /* More space below the plus icon (40px + 44px + 26px gap) */
-    height: calc(200px - 110px - 40px); /* From below plus to above UX label (accounting for text height) */
+    top: 130px; /* More space below the plus icon */
+    height: calc(240px - 130px - 50px); /* From below plus to above UX label (with more space) */
 }
 
 .line-middle {
-    top: calc(200px + 40px); /* Below UX label (200px + approximate text height when rotated) */
-    bottom: calc(100px + 40px); /* Above year label */
+    top: calc(240px + 50px); /* Below UX label with more space */
+    bottom: calc(120px + 50px); /* Above year label with more space */
     height: auto;
 }
 
 .line-bottom {
-    bottom: 60px; /* Bottom of page */
-    height: calc(100px - 60px - 40px); /* From below year label to bottom */
+    top: calc(100vh - 120px + 30px); /* Start 50px below year label (equal spacing to line above) */
+    bottom: 20px; /* Extend to near bottom */
+    height: auto; /* Auto height between top and bottom */
 }
 
 .vertical-label {
@@ -131,16 +351,19 @@ body {
     z-index: 2;
     transform: translateX(-50%) rotate(-90deg);
     background-color: #003C46;
-    padding: 0 8px;
+    padding: 0 16px; /* Increased padding for more space between text and line */
     color: #F2F2F0;
 }
 
 .ux-label {
-    top: 200px;
+    top: 240px; /* More space from top line */
+    font-size: 16px; /* Slightly bigger text */
+    font-weight: 700; /* Bold font weight */
+    color: #FF6B5C; /* Custom color for UX/UI Designer */
 }
 
 .year-label {
-    bottom: 100px;
+    bottom: 120px; /* More space from bottom line */
 }
 
 /* Main Content */
@@ -149,13 +372,15 @@ body {
     z-index: 5;
     max-width: 600px;
     margin-left: 120px;
-    margin-top: 40px;
+    margin-top: 150px; /* Halfway between 120px and 180px */
 }
 
 .stats-section {
     display: flex;
     gap: 60px;
     margin-bottom: 80px;
+    margin-left: 20px; /* Move slightly to the right */
+    margin-top: -40px; /* Move up */
 }
 
 .stat {
@@ -164,21 +389,32 @@ body {
 }
 
 .stat-number {
-    font-size: 25px;
-    font-weight: 400;
+    font-size: 27px; /* Middle between 25px and 30px */
+    font-weight: 400; /* Regular */
     line-height: 1.2;
     margin-bottom: 8px;
+    color: #F2F2F0; /* Same color as stat labels */
+    opacity: 0.7; /* Same opacity as stat labels */
 }
 
 .stat-label {
-    font-size: 18px;
+    font-size: 19px; /* Middle between 18px and 21px */
     color: #F2F2F0;
-    font-weight: 400;
     opacity: 0.7;
 }
 
+.stat-label-main {
+    font-weight: 500; /* Medium for "Leads" and "Client Projects" */
+    color: #F2F2F0; /* Same color as parent */
+}
+
+.stat-label-sub {
+    font-weight: 400; /* Regular for "generated" and "completed" */
+    color: #F2F2F0; /* Same color as parent */
+}
+
 .greeting-section {
-    margin-top: 40px;
+    margin-top: 100px; /* Halfway between 80px and 120px */
 }
 
 .greeting {

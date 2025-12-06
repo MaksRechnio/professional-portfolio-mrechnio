@@ -17,14 +17,25 @@
         <!-- Header -->
         <header class="header">
             <img src="white-plus-icon.png" alt="+" class="plus-sign">
-            <nav class="nav">
-                <a href="#" class="nav-link active">About Me</a>
-                <a href="#" class="nav-link">Portfolio</a>
-                <a href="#" class="nav-link">Services</a>
-                <a href="#" class="nav-link">Blog</a>
-            </nav>
-            <a href="#" class="cta-button">Book a call</a>
+            <div class="header-right">
+                <button class="hamburger-menu" id="hamburger-menu" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
         </header>
+
+        <!-- Vertical Navbar -->
+        <nav class="vertical-navbar" id="vertical-navbar">
+            <button class="close-menu" id="close-menu" aria-label="Close menu">
+                <span></span>
+                <span></span>
+            </button>
+            <a href="#" class="vertical-nav-link">CASE STUDIES</a>
+            <a href="#" class="vertical-nav-link">COMPANIES</a>
+            <a href="#" class="vertical-nav-link">CONTACT</a>
+        </nav>
 
         <!-- Vertical Line with Labels -->
         <div class="vertical-line-segment line-top"></div>
@@ -39,11 +50,11 @@
             <div class="stats-section">
                 <div class="stat">
                     <div class="stat-number">400+</div>
-                    <div class="stat-label">Leads generated</div>
+                    <div class="stat-label"><span class="stat-label-main">Leads</span> <span class="stat-label-sub">generated</span></div>
                 </div>
                 <div class="stat">
                     <div class="stat-number">5+</div>
-                    <div class="stat-label">Client Projects completed</div>
+                    <div class="stat-label"><span class="stat-label-main">Client Projects</span> <span class="stat-label-sub">completed</span></div>
                 </div>
             </div>
 
@@ -70,6 +81,7 @@
     <script type="module" src="script.js"></script>
     <script src="background-animation.js"></script>
     <script src="greeting-animation.js"></script>
+    <script src="menu.js"></script>
 </body>
 </html>
 
