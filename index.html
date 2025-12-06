@@ -4,6 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maksymilian Rechnio - UX/UI Designer</title>
+    
+    <!-- Default Favicon (Fallback - Black for Light Mode) -->
+    <link rel="icon" type="image/x-icon" href="favicon_io-black/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_io-black/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_io-black/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_io-black/apple-touch-icon.png">
+    
+    <!-- Favicons for Light Mode (Black) -->
+    <link rel="icon" type="image/x-icon" href="favicon_io-black/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_io-black/favicon-16x16.png" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_io-black/favicon-32x32.png" media="(prefers-color-scheme: light)">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_io-black/apple-touch-icon.png" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon_io-black/android-chrome-192x192.png" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" sizes="512x512" href="favicon_io-black/android-chrome-512x512.png" media="(prefers-color-scheme: light)">
+    
+    <!-- Favicons for Dark Mode (White) -->
+    <link rel="icon" type="image/x-icon" href="favicon_io-white/favicon.ico" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_io-white/favicon-16x16.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_io-white/favicon-32x32.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_io-white/apple-touch-icon.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon_io-white/android-chrome-192x192.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="512x512" href="favicon_io-white/android-chrome-512x512.png" media="(prefers-color-scheme: dark)">
+    
+    <!-- Web Manifest -->
+    <link rel="manifest" href="favicon_io-black/site.webmanifest">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -78,6 +104,43 @@
         }
     }
     </script>
+    <!-- Favicon Theme Switcher -->
+    <script>
+        (function() {
+            function updateFavicon() {
+                const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const faviconFolder = isDarkMode ? 'favicon_io-white' : 'favicon_io-black';
+                
+                // Update main favicon
+                const favicon = document.querySelector("link[rel='icon']");
+                if (favicon) {
+                    favicon.href = `${faviconFolder}/favicon.ico`;
+                }
+                
+                // Update all favicon sizes
+                document.querySelectorAll("link[rel='icon']").forEach(link => {
+                    if (link.href.includes('favicon')) {
+                        link.href = link.href.replace(/favicon_io-(black|white)/, faviconFolder);
+                    }
+                });
+                
+                // Update apple touch icon
+                const appleIcon = document.querySelector("link[rel='apple-touch-icon']");
+                if (appleIcon) {
+                    appleIcon.href = `${faviconFolder}/apple-touch-icon.png`;
+                }
+            }
+            
+            // Update on load
+            updateFavicon();
+            
+            // Update when theme changes
+            if (window.matchMedia) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+            }
+        })();
+    </script>
+    
     <script type="module" src="script.js"></script>
     <script src="background-animation.js"></script>
     <script src="greeting-animation.js"></script>
