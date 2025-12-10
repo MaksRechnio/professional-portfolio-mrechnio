@@ -10,6 +10,7 @@ body {
     color: #F2F2F0;
     overflow-x: hidden;
     font-weight: 400;
+    overflow-y: auto; /* Enable normal scrolling */
 }
 
 /* Background Animation Canvas */
@@ -26,9 +27,16 @@ body {
 
 .container {
     position: relative;
-    width: 100vw;
-    min-height: 100vh;
+    width: 100%;
+    max-width: 100%;
     padding: 40px 60px;
+    padding-bottom: 200px; /* Increased bottom padding for more space */
+    /* Ensure container has proper height based on content */
+    min-height: 1000px; /* Increased minimum height from 800px to 1000px to accommodate taller canvas */
+    overflow: visible;
+    z-index: 1;
+    /* Clear any floats or absolute positioning issues */
+    clear: both;
 }
 
 /* Header */
@@ -49,7 +57,7 @@ body {
     position: fixed;
     top: 40px;
     right: 40px;
-    z-index: 100;
+    z-index: 10000; /* Very high z-index to stay above all sections */
 }
 
 .plus-sign {
@@ -59,7 +67,7 @@ body {
     position: fixed;
     left: 60px;
     top: 40px;
-    z-index: 11;
+    z-index: 10000; /* Very high z-index to stay above all sections */
     transform: translateX(-50%);
     /* Ensure perfect centering */
     margin: 0;
@@ -80,7 +88,7 @@ body {
     padding: 12px; /* Square button padding */
     width: 48px; /* Square dimensions */
     height: 48px;
-    z-index: 101; /* Higher than navbar to stay on top */
+    z-index: 10001; /* Very high z-index to stay above all sections */
     position: relative;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     
@@ -194,7 +202,7 @@ body {
     width: calc(50% + 50px); /* Picture width (50%) + 50px */
     height: 100vh;
     background-color: #F2F2F0;
-    z-index: 99;
+    z-index: 9999; /* Very high z-index to stay above all sections */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -217,7 +225,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 102;
+    z-index: 10002; /* Very high z-index to stay above all sections */
     opacity: 0;
     transform: scale(0.8);
     transition: opacity 0.3s ease, transform 0.3s ease;
@@ -312,38 +320,35 @@ body {
 }
 
 
-/* Vertical Line Segments */
+/* Vertical Line Segments - Converted to relative positioning for scrolling layout */
 .vertical-line-segment {
-    position: fixed;
+    position: absolute;
     left: 60px;
     width: 1px;
     background-color: #F2F2F0;
     z-index: 1;
     transform: translateX(-50%);
-    /* Perfect centering to match plus icon */
     margin: 0;
     padding: 0;
 }
 
 .line-top {
-    top: 130px; /* More space below the plus icon */
-    height: calc(240px - 130px - 50px); /* From below plus to above UX label (with more space) */
+    top: 130px;
+    height: 60px;
 }
 
 .line-middle {
-    top: calc(240px + 50px); /* Below UX label with more space */
-    bottom: calc(120px + 50px); /* Above year label with more space */
-    height: auto;
+    top: 240px;
+    height: 400px; /* Fixed height for scrolling layout */
+    min-height: 400px;
 }
 
 .line-bottom {
-    top: calc(100vh - 120px + 30px); /* Start 50px below year label (equal spacing to line above) */
-    bottom: 20px; /* Extend to near bottom */
-    height: auto; /* Auto height between top and bottom */
+    display: none; /* Remove bottom line as it was viewport-dependent */
 }
 
 .vertical-label {
-    position: fixed;
+    position: absolute;
     left: 60px;
     transform-origin: center;
     white-space: nowrap;
@@ -351,19 +356,20 @@ body {
     z-index: 2;
     transform: translateX(-50%) rotate(-90deg);
     background-color: #003C46;
-    padding: 0 16px; /* Increased padding for more space between text and line */
+    padding: 0 16px;
     color: #F2F2F0;
 }
 
 .ux-label {
-    top: 240px; /* More space from top line */
-    font-size: 16px; /* Slightly bigger text */
-    font-weight: 700; /* Bold font weight */
-    color: #FF6B5C; /* Custom color for UX/UI Designer */
+    top: 240px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #FF6B5C;
 }
 
 .year-label {
-    bottom: 120px; /* More space from bottom line */
+    top: 640px; /* Position below middle line */
+    position: absolute;
 }
 
 /* Main Content */
@@ -378,7 +384,7 @@ body {
 .stats-section {
     display: flex;
     gap: 60px;
-    margin-bottom: 80px;
+    margin-bottom: 100px; /* Increased bottom margin */
     margin-left: 20px; /* Move slightly to the right */
     margin-top: -40px; /* Move up */
 }
@@ -414,7 +420,8 @@ body {
 }
 
 .greeting-section {
-    margin-top: 100px; /* Halfway between 80px and 120px */
+    margin-top: 120px; /* Increased spacing */
+    margin-bottom: 100px; /* Added bottom margin for more space */
 }
 
 .greeting {
@@ -465,18 +472,301 @@ body {
 
 /* Canvas Container */
 .canvas-container {
-    position: fixed;
+    position: absolute;
     right: 0;
-    top: 0;
+    top: 40px; /* Match container padding */
     width: 50%;
-    height: 100vh;
+    height: calc(100% - 80px); /* Account for container padding */
+    max-height: 1200px; /* Increased height limit from 800px to 1000px */
+    min-height: 1000px; /* Increased minimum height from 600px to 800px */
     z-index: 3;
     cursor: crosshair;
     pointer-events: auto;
+    /* Prevent canvas from extending beyond container */
+    overflow: hidden;
+    /* Ensure it doesn't extend beyond container bounds */
+    bottom: auto;
 }
 
 .canvas-container canvas {
     pointer-events: auto;
+}
+
+/* Quote Section - Second Section */
+.quote-section {
+    position: relative;
+    width: 100%;
+    background-color: #003C46;
+    display: flex; /* Use flex to center content */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    padding: 300px 60px; /* Increased vertical padding for more space */
+    margin: 0; /* No margins - sections flow naturally */
+    z-index: 2;
+    /* Force new stacking context and ensure it's below container */
+    isolation: isolate;
+    /* Ensure it's in normal document flow */
+    clear: both;
+}
+
+.quote-content {
+    max-width: 1400px;
+    padding-left: 120px;
+    width: 100%;
+    margin: 0 auto; /* Center content horizontally */
+    text-align: left; /* Left align the text */
+}
+
+.quote-text {
+    font-size: 80px; /* Increased font size */
+    line-height: 1.4;
+    color: #F2F2F0;
+    font-weight: 200; /* ExtraLight as base */
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    text-align: left; /* Left align the text */
+}
+
+.quote-letter {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.quote-letter.quote-highlight {
+    color: #FF6B5C;
+    /* Font weight is now controlled by JavaScript for individual words */
+}
+
+/* Third View Section */
+.third-view-section {
+    position: relative;
+    width: 100%;
+    background-color: #003C46;
+    display: flex; /* Use flex to center content vertically */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    overflow: hidden;
+    margin: 0; /* No margins - sections flow naturally */
+    padding: 250px 0; /* Increased vertical padding from 200px to 250px */
+    min-height: 900px; /* Increased minimum height from 700px to 900px */
+    z-index: 2;
+    /* Force new stacking context */
+    isolation: isolate;
+    /* Ensure it's in normal document flow */
+    clear: both;
+}
+
+.third-view-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.third-view-content {
+    position: relative;
+    z-index: 10;
+    width: fit-content;
+    max-width: 1200px;
+    margin: 0 auto; /* Center horizontally, no top margin for vertical centering */
+    pointer-events: none;
+    padding: 0 60px; /* Add horizontal padding */
+}
+
+.third-view-text {
+    font-size: 32px;
+    line-height: 1.5; /* Increased from 1.4 for better readability */
+    color: #F2F2F0;
+    font-weight: 400;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.third-view-highlight {
+    color: #FF6B5C;
+    font-weight: 600;
+}
+
+.third-view-medium {
+    font-weight: 500;
+    color: #F2F2F0;
+}
+
+.third-view-semibold {
+    font-weight: 600;
+    color: #F2F2F0;
+}
+
+/* Fourth View Section - Experience Summary */
+.fourth-view-section {
+    position: relative;
+    width: 100%;
+    background-color: #003C46;
+    display: block; /* Change from flex to block for normal flow */
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    margin: 0; /* No margins - sections flow naturally */
+    padding-top: 80px; /* Decreased from 150px to 80px */
+    padding-bottom: 100px; /* Decreased from 200px to 100px */
+    z-index: 2;
+    /* Force new stacking context */
+    isolation: isolate;
+    /* Ensure it's in normal document flow */
+    clear: both;
+}
+
+.experience-header {
+    background-color: #003C46;
+    padding: 40px 60px 30px 60px; /* Decreased padding from 80px/60px to 40px/30px */
+}
+
+.experience-title {
+    font-size: 28px; /* Decreased from 35px to 28px */
+    font-weight: 600;
+    color: #F2F2F0;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    will-change: transform, opacity;
+    opacity: 1; /* Ensure full opacity */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+.experience-content {
+    background-color: #FFFFFF;
+    border-radius: 0 24px 0 0;
+    padding: 50px; /* Decreased padding from 80px to 50px */
+    max-width: 1200px;
+    margin-left: 0;
+    margin-right: auto;
+    align-self: flex-start;
+}
+
+.experience-entry {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 35px; /* Decreased gap from 50px to 35px */
+    margin-bottom: 25px; /* Decreased margin from 40px to 25px */
+    align-items: center;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    will-change: transform, opacity;
+    opacity: 1; /* Ensure full opacity */
+}
+
+.experience-entry:last-child {
+    margin-bottom: 0;
+}
+
+.experience-content-column {
+    display: flex;
+    flex-direction: column;
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+    opacity: 1; /* Ensure full opacity */
+}
+
+.experience-date-column {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+    opacity: 1; /* Ensure full opacity */
+}
+
+.experience-role {
+    font-size: 18px; /* Decreased from 22px to 18px */
+    font-weight: 600;
+    color: #000000 !important; /* Force pure black */
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    margin: 0 0 4px 0;
+    line-height: 1.2;
+    opacity: 1 !important; /* Force full opacity */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+.experience-date {
+    font-size: 28px; /* Decreased from 35px to 28px */
+    font-weight: 700;
+    color: #000000 !important; /* Force pure black */
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-align: right;
+    opacity: 1 !important; /* Force full opacity */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+.experience-description {
+    font-size: 14px;
+    font-weight: 400;
+    color: #000000 !important; /* Force pure black */
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    opacity: 1 !important; /* Force full opacity */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+.experience-description span {
+    color: #000000 !important; /* Force pure black for all spans */
+    opacity: 1 !important; /* Force full opacity */
+}
+
+.experience-regular {
+    font-weight: 400;
+}
+
+.experience-medium {
+    font-weight: 500;
+}
+
+.experience-semibold {
+    font-weight: 600;
+}
+
+.experience-divider {
+    height: 1px;
+    background-color: #E0E0E0;
+    margin: 25px 0; /* Decreased margin from 40px to 25px */
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+}
+
+/* Waterfall Columns */
+.waterfall-column {
+    position: relative;
+    height: 600px; /* Fixed height instead of viewport height */
+    overflow: hidden;
+}
+
+.waterfall-left {
+    grid-column: 1;
+}
+
+.waterfall-right {
+    grid-column: 3;
+}
+
+.waterfall-image {
+    position: absolute;
+    width: auto;
+    height: auto;
+    opacity: 0.8;
+    pointer-events: none;
 }
 
 /* Responsive Design */
@@ -487,6 +777,18 @@ body {
     
     .canvas-container {
         width: 45%;
+    }
+    
+    .quote-text {
+        font-size: 60px; /* Increased responsive font size */
+    }
+    
+    .quote-content {
+        margin: 0 auto; /* Center content */
+    }
+    
+    .third-view-text {
+        font-size: 48px;
     }
 }
 
@@ -526,6 +828,71 @@ body {
         width: 100%;
         height: 400px;
         margin-top: 40px;
+    }
+    
+    .quote-section {
+        padding: 20px 30px;
+        margin-top: 0; /* Remove margin-top for normal flow */
+    }
+    
+    .third-view-section {
+        margin-top: 0; /* Remove margin-top for normal flow */
+    }
+    
+    .fourth-view-section {
+        margin-top: 0; /* Remove margin-top for normal flow */
+    }
+    
+    .quote-content {
+        margin: 0 auto; /* Center content */
+    }
+    
+    .quote-text {
+        font-size: 40px; /* Increased mobile font size */
+        line-height: 1.3;
+    }
+    
+    .quote-section {
+        padding: 200px 30px; /* Adjusted padding for mobile */
+    }
+    
+    .third-view-text {
+        font-size: 32px;
+        line-height: 1.3;
+    }
+    
+    .experience-header {
+        padding: 40px 30px 30px 30px;
+    }
+    
+    .experience-content {
+        padding: 40px 30px;
+        border-radius: 0 16px 0 0;
+    }
+    
+    .experience-entry {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .experience-date-column {
+        justify-content: flex-start;
+    }
+    
+    .experience-date {
+        text-align: left;
+    }
+    
+    .experience-role {
+        font-size: 18px;
+    }
+    
+    .experience-date {
+        font-size: 18px;
+    }
+    
+    .experience-description {
+        font-size: 14px;
     }
 }
 
