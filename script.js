@@ -695,8 +695,8 @@ function animate() {
         const normalizedY = (globalMouseY - 0.5) * 2.0; // -1 to 1
         
         // Calculate target position (increased movement, inverted Y for correct direction)
-        const verticalOffset = -normalizedY * 0.005; // Inverted Y so cursor up = picture up
-        const horizontalOffset = normalizedX * 0.003; // Increased from 0.001
+        const verticalOffset = -normalizedY * 0.015; // Increased movement (was 0.005)
+        const horizontalOffset = normalizedX * 0.012; // Increased movement (was 0.003)
         
         window.targetMeshY = window.baseMeshY + verticalOffset;
         window.targetMeshX = window.baseMeshX + horizontalOffset;
@@ -829,9 +829,9 @@ function updateTextMovement() {
     const normalizedY = (globalMouseY - 0.5) * 2.0; // -1 to 1
     
     // Update target offsets for all text elements (in pixels)
-    // Slightly decreased vertically
-    const verticalOffset = normalizedY * 1.2; // Slightly decreased (was 1.5, now 1.2)
-    const horizontalOffset = normalizedX * 1; // Further reduced (was 2, now 1)
+    // Increased movement for more noticeable effect
+    const verticalOffset = normalizedY * 2.5; // Increased movement (was 1.2)
+    const horizontalOffset = normalizedX * 2.5; // Increased movement (was 1)
     
     textElements.forEach(item => {
         item.targetOffsetY = verticalOffset;
