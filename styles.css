@@ -324,7 +324,7 @@ body {
 .vertical-line-segment {
     position: absolute;
     left: 60px;
-    width: 1px;
+    width: 1px; /* Increased from 1px to 2px */
     background-color: #F2F2F0;
     z-index: 1;
     transform: translateX(-50%);
@@ -334,13 +334,13 @@ body {
 
 .line-top {
     top: 130px;
-    height: 60px;
+    height: 70px; /* Slightly increased from 60px */
 }
 
 .line-middle {
     top: 240px;
-    height: 400px; /* Fixed height for scrolling layout */
-    min-height: 400px;
+    height: 500px; /* Increased from 400px */
+    min-height: 500px; /* Increased from 400px */
 }
 
 .line-bottom {
@@ -368,7 +368,7 @@ body {
 }
 
 .year-label {
-    top: 640px; /* Position below middle line */
+    top: 740px; /* Position below middle line (240px + 500px) */
     position: absolute;
 }
 
@@ -639,8 +639,8 @@ body {
 }
 
 .experience-content {
-    background-color: #FFFFFF;
-    border-radius: 0 24px 0 0;
+    background-color: #F2F2F0; /* Changed from #FFFFFF */
+    border-radius: 0 100px 0 0; /* Increased top-right border radius from 24px to 48px */
     padding: 50px; /* Decreased padding from 80px to 50px */
     max-width: 1200px;
     margin-left: 0;
@@ -708,6 +708,10 @@ body {
     text-rendering: optimizeLegibility;
 }
 
+.experience-date-now {
+    color: #FF6B5C !important; /* Orange color */
+}
+
 .experience-description {
     font-size: 14px;
     font-weight: 400;
@@ -744,6 +748,137 @@ body {
     margin: 25px 0; /* Decreased margin from 40px to 25px */
     transform-style: preserve-3d;
     will-change: transform, opacity;
+}
+
+/* Footer Section */
+.footer-section {
+    position: relative;
+    width: 100%;
+    background-color: #E6E9EB; /* Light grey background */
+    padding: 50px 60px 60px 60px; /* Reduced padding for smaller height */
+    margin: 0;
+    z-index: 2;
+    isolation: isolate;
+    clear: both;
+}
+
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 40px; /* Reduced margin */
+}
+
+.footer-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer-contact-label {
+    font-size: 18px;
+    font-weight: 600;
+    color: #000000;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    margin: 0;
+}
+
+.footer-email {
+    font-size: 26px;
+    font-weight: 600; /* Semibold */
+    color: #FF6B5C; /* Coral/light red color */
+    text-decoration: none;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    transition: opacity 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.footer-email:hover {
+    opacity: 0.8;
+}
+
+.footer-social {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+}
+
+.footer-social-link {
+    font-size: 30px;
+    font-weight: 600;
+    color: #003C46; /* Dark teal/blue-grey */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    transition: opacity 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.footer-social-link:hover {
+    opacity: 0.7;
+}
+
+.footer-title-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.footer-title-wrapper {
+    display: flex;
+    width: fit-content;
+    animation: scrollTitle 30s linear infinite;
+    white-space: nowrap;
+}
+
+.footer-title {
+    font-size: 80px;
+    font-weight: 700;
+    color: #000000;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.2;
+    margin: 0;
+    text-transform: uppercase;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    white-space: nowrap;
+    display: inline-block;
+    padding-right: 100px; /* Space between instances */
+}
+
+.footer-title .title-semibold {
+    font-weight: 600; /* Semibold */
+    color: #000000;
+}
+
+.footer-title .title-extrathin {
+    font-weight: 100; /* ExtraThin */
+    color: #000000;
+}
+
+.footer-title .title-bold {
+    font-weight: 700; /* Bold */
+    color: #000000;
+}
+
+.footer-title .title-regular {
+    font-weight: 400; /* Regular */
+    color: #000000;
+}
+
+@keyframes scrollTitle {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
 }
 
 /* Waterfall Columns */
@@ -789,6 +924,19 @@ body {
     
     .third-view-text {
         font-size: 48px;
+    }
+    
+    .footer-title {
+        font-size: 56px;
+    }
+    
+    .footer-top {
+        flex-direction: column;
+        gap: 40px;
+    }
+    
+    .footer-social {
+        gap: 30px;
     }
 }
 
@@ -867,7 +1015,7 @@ body {
     
     .experience-content {
         padding: 40px 30px;
-        border-radius: 0 16px 0 0;
+        border-radius: 0 60px 0 0; /* Increased top-right border radius for mobile to match desktop proportion */
     }
     
     .experience-entry {
@@ -893,6 +1041,39 @@ body {
     
     .experience-description {
         font-size: 14px;
+    }
+    
+    .footer-section {
+        padding: 40px 30px 50px 30px;
+    }
+    
+    .footer-title {
+        font-size: 42px;
+        padding-right: 60px;
+    }
+    
+    .footer-top {
+        flex-direction: column;
+        gap: 30px;
+        margin-bottom: 60px;
+    }
+    
+    .footer-social {
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;
+    }
+    
+    .footer-contact-label {
+        font-size: 12px;
+    }
+    
+    .footer-email {
+        font-size: 16px;
+    }
+    
+    .footer-social-link {
+        font-size: 12px;
     }
 }
 

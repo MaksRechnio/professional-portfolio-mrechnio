@@ -1,7 +1,8 @@
 // Letter-by-Letter Reveal Animation
 // Letters appear one by one quickly to form the new word
+// Updated: Hoi! removed - only Hey! and Cześć! remain
 
-const greetings = ["Hey!", "Cześć!", "Hoi!"];
+const greetings = ["Hey!", "Cześć!"];
 let currentIndex = 0;
 let isAnimating = false;
 let animationTimeout = null;

@@ -439,7 +439,7 @@ function createShaderMaterial() {
     const mesh = new THREE.Mesh(geometry, shaderMaterial);
     
     // Base position
-    const baseY = 0.35; /* Increased from 0.20 to move picture higher */
+    const baseY = 0.42; /* Increased from 0.35 to move picture higher */
     const baseX = -0.0;
     mesh.position.y = baseY;
     mesh.position.x = baseX;
@@ -1687,9 +1687,9 @@ function initFourthViewAnimations() {
         const sectionBottom = sectionRect.bottom;
         
         // Calculate scroll progress for the section
-        // Animation starts when section enters viewport
+        // Animation starts when section enters viewport - tighter scroll range for faster animation
         const animationStart = windowHeight * 0.8;
-        const animationEnd = -windowHeight * 0.2;
+        const animationEnd = -windowHeight * 0.08; // Changed from -0.2 to -0.1 for tighter/faster scroll
         const scrollRange = animationStart - animationEnd;
         
         let sectionProgress = 0;
