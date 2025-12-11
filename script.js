@@ -259,16 +259,47 @@ function createShaderMaterial() {
             return minDist;
         }
 
-        // Create enhanced 3D shadow with multiple layers on both sides
+        // Get vertical sweep intensity - continuous steady rhythm, orange shadow sweeps from top to bottom
+        float getVerticalSweepIntensity(float t, vec2 uv) {
+            // Continuous cycle repeats every 4 seconds (steady rhythm)
+            float cycleTime = mod(t, 4.0);
+            
+            // Continuous sweep: 0.0 to 3.0 seconds (sweep down), then 1 second pause
+            float sweepIntensity = 0.0;
+            if (cycleTime < 3.0) {
+                float sweepProgress = cycleTime / 3.0; // 0 to 1
+                // Sweep position from top (1.0) to bottom (0.0)
+                float sweepPosition = 1.0 - sweepProgress;
+                // Large expansion - much wider band extending outside silhouette
+                float distanceFromSweep = abs(uv.y - sweepPosition);
+                float bandWidth = 0.6; // Much larger expansion band
+                float rawSweep = 1.0 - smoothstep(0.0, bandWidth, distanceFromSweep);
+                
+                // Smooth fade in at the start (first 0.5 seconds) - much smoother
+                float fadeIn = smoothstep(0.0, 0.5, cycleTime);
+                // Smooth fade out at the end (last 0.6 seconds) - much smoother
+                float fadeOut = smoothstep(0.0, 0.6, 3.0 - cycleTime);
+                // Combine fades with extra smoothing
+                float fadeMultiplier = min(fadeIn, fadeOut);
+                // Apply additional smoothstep for ultra-smooth transitions
+                fadeMultiplier = smoothstep(0.0, 1.0, fadeMultiplier);
+                
+                sweepIntensity = rawSweep * fadeMultiplier;
+            }
+            
+            return sweepIntensity; // Return sweep intensity (0 when paused, 0-1 during sweep)
+        }
+
+        // Create enhanced 3D shadow with multiple layers on both sides - extends more outside silhouette
         float createShadow(vec2 uv) {
-            vec2 shadowOffsetRight = vec2(0.025, -0.008); // Rightward and slightly up (main light from left)
-            vec2 shadowOffsetLeft = vec2(-0.015, -0.005); // Leftward and slightly up (secondary light from right)
+            vec2 shadowOffsetRight = vec2(0.05, -0.012); // Extended more to the right
+            vec2 shadowOffsetLeft = vec2(-0.05, -0.012); // Extended more to the left
             float shadowIntensity = 0.0;
             
             // RIGHT SIDE SHADOWS (main shadow)
-            // Layer 1: Close shadow (sharp, dark)
+            // Layer 1: Close shadow (sharp, dark) - extended blur
             int samples1 = 9;
-            float blurRadius1 = 0.006; // Tighter blur for close shadow
+            float blurRadius1 = 0.015; // Extended blur radius
             float layer1Intensity = 0.0;
             
             for (int x = -1; x <= 1; x++) {
@@ -281,9 +312,9 @@ function createShaderMaterial() {
             }
             layer1Intensity /= float(samples1);
             
-            // Layer 2: Mid shadow (medium blur)
+            // Layer 2: Mid shadow (medium blur) - extended blur
             int samples2 = 25;
-            float blurRadius2 = 0.012; // Medium blur
+            float blurRadius2 = 0.025; // Extended blur radius
             float layer2Intensity = 0.0;
             
             for (int x = -2; x <= 2; x++) {
@@ -296,9 +327,9 @@ function createShaderMaterial() {
             }
             layer2Intensity /= float(samples2);
             
-            // Layer 3: Far shadow (large blur, soft)
+            // Layer 3: Far shadow (large blur, soft) - extended blur
             int samples3 = 25;
-            float blurRadius3 = 0.020; // Large blur for soft shadow
+            float blurRadius3 = 0.040; // Extended blur radius for more extension
             float layer3Intensity = 0.0;
             
             for (int x = -2; x <= 2; x++) {
@@ -343,7 +374,7 @@ function createShaderMaterial() {
             shadowIntensity = layer1Intensity * 0.6 + layer2Intensity * 0.3 + layer3Intensity * 0.2 + 
                              layer4Intensity * 0.15 + layer5Intensity * 0.1;
             
-            return shadowIntensity * 0.7; // Overall shadow intensity
+            return shadowIntensity; // Return raw intensity (will be multiplied by sweep intensity)
         }
 
         void main() {
@@ -354,9 +385,28 @@ function createShaderMaterial() {
             vec3 desaturatedColor = mix(profileColor.rgb, vec3(luminance), 0.1); // Mix with grayscale (10% reduction)
             profileColor.rgb = desaturatedColor;
             
-            // Create iOS-style blurred shadow (always rendered first)
-            float shadowAlpha = createShadow(vUv);
-            vec4 shadowLayer = vec4(0.0, 0.0, 0.0, shadowAlpha);
+            // Create shadow only when animation is active (no steady shadow)
+            float baseShadowAlpha = createShadow(vUv);
+            
+            // Get vertical sweep intensity for animation (sweeps from top to bottom)
+            float sweepIntensity = getVerticalSweepIntensity(time, vUv);
+            
+            // Shadow only appears during sweep animation (multiply by sweep intensity)
+            float shadowAlpha = baseShadowAlpha * sweepIntensity;
+            
+            // Mix orange and black based on vertical position for visibility
+            // Orange at top, transitioning to black at bottom
+            float orangeMix = smoothstep(0.0, 1.0, vUv.y) * sweepIntensity; // More orange at top
+            orangeMix = clamp(orangeMix * 0.8, 0.0, 0.8); // Up to 80% orange
+            
+            // Orange color (#FF6B5C = rgb(255, 107, 92))
+            vec3 orangeColor = vec3(255.0/255.0, 107.0/255.0, 92.0/255.0);
+            vec3 blackColor = vec3(0.0, 0.0, 0.0);
+            
+            // Mix orange with black - more orange at top, more black at bottom
+            vec3 shadowColor = mix(blackColor, orangeColor, orangeMix);
+            
+            vec4 shadowLayer = vec4(shadowColor, shadowAlpha);
             
             // Start with shadow as base layer
             vec4 finalColor = shadowLayer;
