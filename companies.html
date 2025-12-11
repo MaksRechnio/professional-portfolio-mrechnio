@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Companies - Maksymilian Rechnio</title>
+    
+    <!-- Default Favicon (Fallback - Black for Light Mode) -->
+    <link rel="icon" type="image/x-icon" href="favicon_io-black/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_io-black/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_io-black/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_io-black/apple-touch-icon.png">
+    
+    <!-- Favicons for Light Mode (Black) -->
+    <link rel="icon" type="image/x-icon" href="favicon_io-black/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_io-black/favicon-16x16.png" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_io-black/favicon-32x32.png" media="(prefers-color-scheme: light)">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_io-black/apple-touch-icon.png" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon_io-black/android-chrome-192x192.png" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" sizes="512x512" href="favicon_io-black/android-chrome-512x512.png" media="(prefers-color-scheme: light)">
+    
+    <!-- Favicons for Dark Mode (White) -->
+    <link rel="icon" type="image/x-icon" href="favicon_io-white/favicon.ico" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_io-white/favicon-16x16.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_io-white/favicon-32x32.png" media="(prefers-color-scheme: dark)">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_io-white/apple-touch-icon.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon_io-white/android-chrome-192x192.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" sizes="512x512" href="favicon_io-white/android-chrome-512x512.png" media="(prefers-color-scheme: dark)">
+    
+    <!-- Web Manifest -->
+    <link rel="manifest" href="favicon_io-black/site.webmanifest">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #F2F2F0;
+        }
+        .page-content {
+            background-color: #F2F2F0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 80px 60px 100px 60px;
+            position: relative;
+            z-index: 1;
+            margin-top: 0;
+        }
+        .page-title {
+            font-size: 250px;
+            font-weight: 200;
+            color: #003C46;
+            text-align: left;
+            line-height: 1.2;
+            margin-top: 0;
+        }
+        .page-title .semibold {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="custom-cursor" id="custom-cursor"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <a href="index.html"><img src="plus-icon.png" alt="+" class="plus-sign"></a>
+        <div class="header-right">
+            <button class="hamburger-menu" id="hamburger-menu" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Vertical Navbar -->
+    <nav class="vertical-navbar" id="vertical-navbar">
+        <button class="close-menu" id="close-menu" aria-label="Close menu">
+            <span></span>
+            <span></span>
+        </button>
+        <a href="case-studies.html" class="vertical-nav-link">CASE STUDIES</a>
+        <a href="companies.html" class="vertical-nav-link">COMPANIES</a>
+        <a href="contact.html" class="vertical-nav-link">CONTACT</a>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="page-content">
+        <h1 class="page-title">Companies</h1>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="footer-section" id="footer-section">
+        <div class="footer-top">
+            <div class="footer-contact">
+                <p class="footer-contact-label">CONTACT ME HERE:</p>
+                <a href="mailto:maksymilian@exqdigital.com" class="footer-email" id="footer-email">maksymilian@exqdigital.com</a>
+            </div>
+            <div class="footer-social">
+                <a href="https://www.linkedin.com/in/maksymilian-rechnio" target="_blank" rel="noopener noreferrer" class="footer-social-link">LINKEDIN</a>
+                <a href="https://www.instagram.com/maksymilian_rechnio/" target="_blank" rel="noopener noreferrer" class="footer-social-link">INSTAGRAM</a>
+                <a href="https://wa.me/48609409779" target="_blank" rel="noopener noreferrer" class="footer-social-link">WHATSAPP</a>
+            </div>
+        </div>
+        <div class="footer-title-container">
+            <div class="footer-title-wrapper">
+                <div class="footer-title" id="footer-title-1"></div>
+                <div class="footer-title" id="footer-title-2"></div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="menu.js"></script>
+    <script src="cursor.js"></script>
+    <script src="footer-animation.js"></script>
+    <script src="tab-visibility.js"></script>
+</body>
+</html>
+

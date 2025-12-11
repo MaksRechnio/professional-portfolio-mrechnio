@@ -144,32 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Start animation
     animateCursor();
     
-    // Hide default cursor on all elements (including the picture)
-    function hideDefaultCursor() {
-        const allElements = document.querySelectorAll('*');
-        allElements.forEach(el => {
-            el.style.cursor = 'none';
-            el.style.setProperty('cursor', 'none', 'important');
-        });
-        
-        // Also hide default cursor on body and html
-        document.body.style.cursor = 'none';
-        document.body.style.setProperty('cursor', 'none', 'important');
-        document.documentElement.style.cursor = 'none';
-        document.documentElement.style.setProperty('cursor', 'none', 'important');
-    }
-    
-    // Hide cursor immediately
-    hideDefaultCursor();
-    
-    // Also hide cursor on dynamically added elements
-    const observer = new MutationObserver(() => {
-        hideDefaultCursor();
-    });
-    
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
+    // Hide default cursor using CSS only (no inline styles)
+    // The CSS file already handles cursor: none !important for all elements
 });
 

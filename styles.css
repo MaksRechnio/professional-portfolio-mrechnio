@@ -117,6 +117,11 @@ a, button, input, textarea, select, [role="button"] {
     /* Ensure perfect centering */
     margin: 0;
     padding: 0;
+    transition: transform 0.4s ease-in-out;
+}
+
+.plus-sign:hover {
+    transform: translateX(-50%) rotate(45deg);
 }
 
 /* Hamburger Menu */
