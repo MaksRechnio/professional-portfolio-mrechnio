@@ -261,13 +261,13 @@ function createShaderMaterial() {
 
         // Get vertical sweep intensity - continuous steady rhythm, orange shadow sweeps from top to bottom
         float getVerticalSweepIntensity(float t, vec2 uv) {
-            // Continuous cycle repeats every 4 seconds (steady rhythm)
-            float cycleTime = mod(t, 4.0);
+            // Continuous cycle repeats every 6 seconds (slower rhythm)
+            float cycleTime = mod(t, 6.0);
             
-            // Continuous sweep: 0.0 to 3.0 seconds (sweep down), then 1 second pause
+            // Continuous sweep: 0.0 to 4.5 seconds (sweep down), then 1.5 second pause
             float sweepIntensity = 0.0;
-            if (cycleTime < 3.0) {
-                float sweepProgress = cycleTime / 3.0; // 0 to 1
+            if (cycleTime < 4.5) {
+                float sweepProgress = cycleTime / 4.5; // 0 to 1
                 // Sweep position from top (1.0) to bottom (0.0)
                 float sweepPosition = 1.0 - sweepProgress;
                 // Large expansion - much wider band extending outside silhouette
@@ -275,10 +275,10 @@ function createShaderMaterial() {
                 float bandWidth = 0.6; // Much larger expansion band
                 float rawSweep = 1.0 - smoothstep(0.0, bandWidth, distanceFromSweep);
                 
-                // Smooth fade in at the start (first 0.5 seconds) - much smoother
-                float fadeIn = smoothstep(0.0, 0.5, cycleTime);
-                // Smooth fade out at the end (last 0.6 seconds) - much smoother
-                float fadeOut = smoothstep(0.0, 0.6, 3.0 - cycleTime);
+                // Smooth fade in at the start (first 0.7 seconds) - much smoother
+                float fadeIn = smoothstep(0.0, 0.7, cycleTime);
+                // Smooth fade out at the end (last 0.8 seconds) - much smoother
+                float fadeOut = smoothstep(0.0, 0.8, 4.5 - cycleTime);
                 // Combine fades with extra smoothing
                 float fadeMultiplier = min(fadeIn, fadeOut);
                 // Apply additional smoothstep for ultra-smooth transitions
@@ -1088,6 +1088,7 @@ function initWaterfallAnimation() {
         'orrys-bottom-right.png',
         'orrys-left.png',
         'orrys-top-right.png',
+        'orrys-website.png',
         'overload-bottom-left.png',
         'overload-bottom-right.png',
         'overload-middle.png',
@@ -1126,11 +1127,22 @@ function initWaterfallAnimation() {
                 img.style.position = 'absolute';
                 
                 img.onload = function() {
-                    // Set to half size
+                    // Set size - larger for horizontal images
                     const originalWidth = img.naturalWidth;
                     const originalHeight = img.naturalHeight;
-                    const scaledWidth = originalWidth * 0.5;
-                    const scaledHeight = originalHeight * 0.5;
+                    const aspectRatio = originalWidth / originalHeight;
+                    
+                    let scaledWidth, scaledHeight;
+                    // Check if horizontal (aspect ratio > 1)
+                    if (aspectRatio > 1) {
+                        // Horizontal images: fixed width of 600px (increased from ~250px)
+                        scaledWidth = 600;
+                        scaledHeight = scaledWidth / aspectRatio;
+                    } else {
+                        // Vertical images: 45% size (reduced by 10% from 50%)
+                        scaledWidth = originalWidth * 0.45;
+                        scaledHeight = originalHeight * 0.45;
+                    }
                     
                     img.style.width = `${scaledWidth}px`;
                     img.style.height = `${scaledHeight}px`;
@@ -1285,13 +1297,14 @@ function initThirdViewWebGL() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.outputColorSpace = THREE.SRGBColorSpace; // Ensure proper color space
     
-    // Image files list (23 images)
+    // Image files list (24 images)
     const imageFiles = [
         'exq-down.png', 'exq-middle-1.png', 'exq-middle-2.png', 'exq-top.png',
         'mentis-down-right.png', 'mentis-middle.png', 'mentis-top-left.png', 'mentis-top-right.png',
         'onlylabs-bottom.png', 'onlylabs-top.png',
         'openline-left.png', 'openline-middle.png', 'openline-right.png',
         'orrys-bottom-right.png', 'orrys-left.png', 'orrys-top-right.png',
+        'orrys-website.png',
         'overload-bottom-left.png', 'overload-bottom-right.png', 'overload-middle.png',
         'overload-top-left.png', 'overload-top-right.png',
         'tuner-left.png', 'tuner-right.png'
@@ -1324,9 +1337,19 @@ function initThirdViewWebGL() {
             
             // Calculate aspect ratio
             const aspect = texture.image.width / texture.image.height;
-            const baseWidth = 1.5; // Base width for images
-            const width = baseWidth;
-            const height = width / aspect;
+            
+            // Set fixed larger size for horizontal images (aspect > 1)
+            let width, height;
+            if (aspect > 1) {
+                // Horizontal images: fixed width of 2.5 (increased from 1.5)
+                width = 2.5;
+                height = width / aspect;
+            } else {
+                // Vertical images: reduced by 10% (from 1.5 to 1.35)
+                const baseWidth = 1.35;
+                width = baseWidth;
+                height = width / aspect;
+            }
             
             // Create plane geometry - flat orientation
             const geometry = new THREE.PlaneGeometry(width, height);
@@ -1497,7 +1520,7 @@ function initThirdViewWebGL() {
         // Animation starts when section enters viewport (sectionTop < windowHeight)
         // Animation completes when section has scrolled slightly past viewport
         const animationStart = windowHeight; // Section top at viewport top
-        const animationEnd = -windowHeight * 0.4; // Section top slightly past viewport (changed from 0.35 to 0.4 for slightly slower speed)
+        const animationEnd = -windowHeight * 0.5; // Section top further past viewport (loosened scroll - slower animation)
         const scrollRange = animationStart - animationEnd;
         
         // Calculate progress: 0 to 1 over relaxed scroll range
@@ -1739,7 +1762,7 @@ function initFourthViewAnimations() {
         // Calculate scroll progress for the section
         // Animation starts when section enters viewport - tighter scroll range for faster animation
         const animationStart = windowHeight * 0.8;
-        const animationEnd = -windowHeight * 0.08; // Changed from -0.2 to -0.1 for tighter/faster scroll
+        const animationEnd = -windowHeight * 0.12; // Loosened scroll - slower animation (more negative = larger scroll range)
         const scrollRange = animationStart - animationEnd;
         
         let sectionProgress = 0;
