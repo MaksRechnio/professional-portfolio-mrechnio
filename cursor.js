@@ -22,9 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Load the profile image to check pixel data
                 profileImage = new Image();
                 profileImage.crossOrigin = 'anonymous';
-                profileImage.src = 'profile-pic.png';
+                profileImage.src = 'mrech.png';
                 profileImage.onload = () => {
-                    console.log('Profile image loaded for cursor detection');
+                    console.log('Profile image loaded for cursor detection:', profileImage.width, 'x', profileImage.height);
+                };
+                profileImage.onerror = (error) => {
+                    console.error('Error loading mrech.png for cursor detection:', error);
                 };
             }
         }

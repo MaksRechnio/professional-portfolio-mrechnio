@@ -47,16 +47,18 @@ function calculateRevealRadius() {
 }
 
 function initTextures() {
-    textureLoader.load('profile-pic.png', (profile) => {
+    textureLoader.load('mrech.png', (profile) => {
         profileTexture = profile;
         profileTexture.minFilter = THREE.LinearFilter;
         profileTexture.magFilter = THREE.LinearFilter;
-        console.log('Profile texture loaded:', profile.width, 'x', profile.height);
+        profileTexture.needsUpdate = true; // Ensure texture is updated
+        console.log('Profile texture loaded:', profile.image.width, 'x', profile.image.height);
+        console.log('Texture aspect ratio:', profile.image.width / profile.image.height);
 
         calculateRevealRadius();
         createShaderMaterial();
     }, undefined, (error) => {
-        console.error('Error loading profile-pic.png:', error);
+        console.error('Error loading mrech.png:', error);
     });
 }
 
@@ -463,6 +465,15 @@ function createShaderMaterial() {
         }
     `;
 
+    // Calculate aspect ratio from loaded texture
+    const aspectRatio = profileTexture.image.width / profileTexture.image.height;
+    console.log('Creating geometry with aspect ratio:', aspectRatio, 'Image dimensions:', profileTexture.image.width, 'x', profileTexture.image.height);
+    
+    // Use aspect ratio to maintain correct proportions
+    // Base width reduced by 2x (from 2.65 to 1.325) to make picture smaller
+    const baseWidth = 1.40;
+    const baseHeight = baseWidth / aspectRatio;
+    
     shaderMaterial = new THREE.ShaderMaterial({
         uniforms: {
             profileTexture: { value: profileTexture },
@@ -482,14 +493,17 @@ function createShaderMaterial() {
         fragmentShader,
         transparent: true
     });
+    
+    // Texture uniform is already set in the uniforms object above
+    // The texture.needsUpdate flag was set in initTextures() when the texture loaded
 
-    // Make picture bigger - scale geometry
-    const geometry = new THREE.PlaneGeometry(2.65, 2.65); /* Increased from 2.5 to make picture bigger */
+    // Make picture bigger - scale geometry using actual aspect ratio
+    const geometry = new THREE.PlaneGeometry(baseWidth, baseHeight);
     
     const mesh = new THREE.Mesh(geometry, shaderMaterial);
     
     // Base position
-    const baseY = 0.42; /* Increased from 0.35 to move picture higher */
+    const baseY = 0.06  ; /* Lowered to move picture down */
     const baseX = -0.0;
     mesh.position.y = baseY;
     mesh.position.x = baseX;
