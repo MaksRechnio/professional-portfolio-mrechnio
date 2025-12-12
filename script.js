@@ -263,13 +263,13 @@ function createShaderMaterial() {
 
         // Get vertical sweep intensity - continuous steady rhythm, orange shadow sweeps from top to bottom
         float getVerticalSweepIntensity(float t, vec2 uv) {
-            // Continuous cycle repeats every 6 seconds (slower rhythm)
-            float cycleTime = mod(t, 6.0);
+            // Continuous cycle repeats every 8.0 seconds (slowed down by 2x)
+            float cycleTime = mod(t, 8.0);
             
-            // Continuous sweep: 0.0 to 4.5 seconds (sweep down), then 1.5 second pause
+            // Continuous sweep: 0.0 to 1.5 seconds (sweep down - slowed by 2x), then 6.5 second pause
             float sweepIntensity = 0.0;
-            if (cycleTime < 4.5) {
-                float sweepProgress = cycleTime / 4.5; // 0 to 1
+            if (cycleTime < 1.5) {
+                float sweepProgress = cycleTime / 1.5; // 0 to 1 (slowed down by 2x)
                 // Sweep position from top (1.0) to bottom (0.0)
                 float sweepPosition = 1.0 - sweepProgress;
                 // Large expansion - much wider band extending outside silhouette
@@ -277,10 +277,10 @@ function createShaderMaterial() {
                 float bandWidth = 0.6; // Much larger expansion band
                 float rawSweep = 1.0 - smoothstep(0.0, bandWidth, distanceFromSweep);
                 
-                // Smooth fade in at the start (first 0.7 seconds) - much smoother
-                float fadeIn = smoothstep(0.0, 0.7, cycleTime);
-                // Smooth fade out at the end (last 0.8 seconds) - much smoother
-                float fadeOut = smoothstep(0.0, 0.8, 4.5 - cycleTime);
+                // Smooth fade in at the start (first 0.25 seconds) - adjusted for 2x slower stroke
+                float fadeIn = smoothstep(0.0, 0.25, cycleTime);
+                // Smooth fade out at the end (last 0.25 seconds) - adjusted for 2x slower stroke
+                float fadeOut = smoothstep(0.0, 0.25, 1.5 - cycleTime);
                 // Combine fades with extra smoothing
                 float fadeMultiplier = min(fadeIn, fadeOut);
                 // Apply additional smoothstep for ultra-smooth transitions
@@ -393,8 +393,11 @@ function createShaderMaterial() {
             // Get vertical sweep intensity for animation (sweeps from top to bottom)
             float sweepIntensity = getVerticalSweepIntensity(time, vUv);
             
-            // Shadow only appears during sweep animation (multiply by sweep intensity)
-            float shadowAlpha = baseShadowAlpha * sweepIntensity;
+            // Vertical fade: 100% opacity at top (vUv.y = 1.0), 0% at bottom (vUv.y = 0.0)
+            float verticalFade = vUv.y;
+            
+            // Shadow only appears during sweep animation (multiply by sweep intensity and vertical fade)
+            float shadowAlpha = baseShadowAlpha * sweepIntensity * verticalFade;
             
             // Mix orange and black based on vertical position for visibility
             // Orange at top, transitioning to black at bottom
