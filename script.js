@@ -41,9 +41,9 @@ function calculateRevealRadius() {
     const containerRect = container.getBoundingClientRect();
     // Use width for horizontal, height for vertical - use the smaller to ensure it fits
     const minDimension = Math.min(containerRect.width, containerRect.height);
-    // 140px wide = 70px radius (decreased from 80px)
-    revealRadiusNormalized = (70.0) / minDimension;
-    console.log('Reveal radius:', revealRadiusNormalized, 'for 100px width, container:', containerRect.width, 'x', containerRect.height);
+    // Increased liquid bubble size: 140px wide = 140px radius (doubled from 70px)
+    revealRadiusNormalized = (100.0) / minDimension;
+    console.log('Reveal radius:', revealRadiusNormalized, 'for 140px radius, container:', containerRect.width, 'x', containerRect.height);
 }
 
 function initTextures() {
@@ -138,9 +138,9 @@ function createShaderMaterial() {
             float pulse = sin(time * 2.5 + random(grid) * 6.28) * 0.5 + 0.5;
             float fade = smoothstep(0.2, 0.8, pulse);
             
-            // Create dot shape with specified size
+            // Create dot shape with specified size - increased bubble size
             float dist = length(animatedPos);
-            float dot = smoothstep(0.25, 0.13, dist) * fade; // Smaller dots (0.25, 0.13)
+            float dot = smoothstep(0.7, 0.5, dist) * fade; // Bigger bubbles (increased from 0.25, 0.13 to 0.4, 0.2)
             
             // Randomly show/hide dots for flow effect (more dots visible)
             float visibility = step(0.15, random(grid + time * 0.1)); // Lower threshold = more visible
@@ -381,11 +381,6 @@ function createShaderMaterial() {
 
         void main() {
             vec4 profileColor = texture2D(profileTexture, vUv);
-            
-            // Reduce saturation by 10%
-            float luminance = dot(profileColor.rgb, vec3(0.299, 0.587, 0.114)); // Convert to grayscale
-            vec3 desaturatedColor = mix(profileColor.rgb, vec3(luminance), 0.1); // Mix with grayscale (10% reduction)
-            profileColor.rgb = desaturatedColor;
             
             // Create shadow only when animation is active (no steady shadow)
             float baseShadowAlpha = createShadow(vUv);

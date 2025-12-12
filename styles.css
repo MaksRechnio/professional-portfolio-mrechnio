@@ -389,8 +389,8 @@ a, button, input, textarea, select, [role="button"] {
 
 .line-middle {
     top: 240px;
-    height: 500px; /* Increased from 400px */
-    min-height: 500px; /* Increased from 400px */
+    height: 560px; /* Vertical line height - adjusted to match scroll down indicator position */
+    min-height: 560px; /* Minimum height to ensure line visibility */
 }
 
 .line-bottom {
@@ -418,7 +418,7 @@ a, button, input, textarea, select, [role="button"] {
 }
 
 .year-label {
-    top: 740px; /* Position below middle line (240px + 500px) */
+    top: 800px; /* Position below middle line (240px + 560px) */
     position: absolute;
 }
 
@@ -445,7 +445,7 @@ a, button, input, textarea, select, [role="button"] {
 }
 
 .stat-number {
-    font-size: 27px; /* Middle between 25px and 30px */
+    font-size: 40px; /* Increased from 27px for better visibility of stat numbers (4+, 5+) */
     font-weight: 400; /* Regular */
     line-height: 1.2;
     margin-bottom: 8px;
@@ -518,6 +518,24 @@ a, button, input, textarea, select, [role="button"] {
 
 .intro-medium {
     font-weight: 500;
+}
+
+/* Scroll down indicator - positioned near left edge, aligned with vertical line end */
+.scroll-down {
+    font-size: 14px; /* Smaller text size for subtle indicator */
+    font-weight: 500; /* Medium font weight */
+    color: #F2F2F0;
+    margin-top: 0;
+    margin-left: 0;
+    position: absolute;
+    top: 300px; /* Positioned higher on the page */
+    left: 0; /* Aligned to left edge of main-content */
+    display: inline-block;
+}
+
+.scroll-arrow {
+    display: inline-block;
+    margin-left: 6px;
 }
 
 /* Canvas Container */
