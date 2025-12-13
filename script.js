@@ -2,16 +2,19 @@ import * as THREE from 'three';
 
 // Scene setup
 const scene = new THREE.Scene();
-const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+const container = document.getElementById('canvas-container');
+const containerRect = container.getBoundingClientRect();
+
+// Calculate aspect ratio to prevent horizontal compression
+const containerAspect = containerRect.width / containerRect.height;
+const camera = new THREE.OrthographicCamera(-containerAspect, containerAspect, 1, -1, 0, 1);
+
 const renderer = new THREE.WebGLRenderer({
     antialias: true,
     alpha: true,
     premultipliedAlpha: false
 });
 renderer.setClearColor(0x000000, 0);
-
-const container = document.getElementById('canvas-container');
-const containerRect = container.getBoundingClientRect();
 renderer.setSize(containerRect.width, containerRect.height);
 renderer.setPixelRatio(window.devicePixelRatio);
 container.appendChild(renderer.domElement);
@@ -781,6 +784,13 @@ renderer.domElement.addEventListener('mousedown', onMouseClick);
 
 window.addEventListener('resize', () => {
     const newRect = container.getBoundingClientRect();
+    const newAspect = newRect.width / newRect.height;
+    
+    // Update camera to match container aspect ratio to prevent compression
+    camera.left = -newAspect;
+    camera.right = newAspect;
+    camera.updateProjectionMatrix();
+    
     renderer.setSize(newRect.width, newRect.height);
     calculateRevealRadius();
     

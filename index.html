@@ -36,6 +36,14 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Loading...</p>
+        </div>
+    </div>
+
     <!-- Custom Cursor -->
     <div class="custom-cursor" id="custom-cursor"></div>
     <!-- Background Animation Canvas - Disabled -->
@@ -237,6 +245,19 @@
     <script src="cursor.js"></script>
     <script src="tab-visibility.js"></script>
     <script src="ux-label-scroll.js"></script>
+    
+    <!-- Loading Screen Script -->
+    <script>
+        window.addEventListener('load', function() {
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+                // Wait a bit for smooth transition, then hide
+                setTimeout(function() {
+                    loadingScreen.classList.add('hidden');
+                }, 300);
+            }
+        });
+    </script>
 </body>
 </html>
 

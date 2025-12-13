@@ -34,6 +34,59 @@ a, button, input, textarea, select, [role="button"] {
     cursor: none !important;
 }
 
+/* Loading Screen - Full screen overlay shown while page loads */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #003C46; /* Match site background color */
+    z-index: 99999; /* Above all other content */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out; /* Smooth fade out */
+    visibility: visible;
+}
+
+.loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(242, 242, 240, 0.2);
+    border-top-color: #F2F2F0;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-text {
+    font-size: 16px;
+    font-weight: 400;
+    color: #F2F2F0;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    letter-spacing: 1px;
+}
+
 /* Custom Cursor */
 .custom-cursor {
     position: fixed;
@@ -528,7 +581,7 @@ a, button, input, textarea, select, [role="button"] {
     margin-top: 0;
     margin-left: 0;
     position: absolute;
-    top: 300px; /* Positioned higher on the page */
+    top: 440px; /* Positioned lower on the page */
     left: 0; /* Aligned to left edge of main-content */
     display: inline-block;
 }
