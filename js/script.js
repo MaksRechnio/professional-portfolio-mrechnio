@@ -50,7 +50,7 @@ function calculateRevealRadius() {
 }
 
 function initTextures() {
-    textureLoader.load('mrech.png', (profile) => {
+    textureLoader.load('images/mrech.png', (profile) => {
         profileTexture = profile;
         profileTexture.minFilter = THREE.LinearFilter;
         profileTexture.magFilter = THREE.LinearFilter;
@@ -61,7 +61,7 @@ function initTextures() {
         calculateRevealRadius();
         createShaderMaterial();
     }, undefined, (error) => {
-        console.error('Error loading mrech.png:', error);
+        console.error('Error loading images/mrech.png:', error);
     });
 }
 
@@ -1144,7 +1144,7 @@ function initWaterfallAnimation() {
             
             images.forEach((filename, index) => {
                 const img = new Image();
-                img.src = `third-page-pictures/${filename}`;
+                img.src = `images/third-page-pictures/${filename}`;
                 img.className = 'waterfall-image';
                 img.style.position = 'absolute';
                 
@@ -1347,7 +1347,7 @@ function initThirdViewWebGL() {
     
     // Create image planes in circular pattern
     imageFiles.forEach((filename, index) => {
-        textureLoader.load(`third-page-pictures/${filename}`, (texture) => {
+        textureLoader.load(`images/third-page-pictures/${filename}`, (texture) => {
             // Configure texture properly - prevent white overlay and ensure high quality
             texture.colorSpace = THREE.SRGBColorSpace;
             texture.flipY = true; // Default Three.js texture orientation (flip Y for correct display)
