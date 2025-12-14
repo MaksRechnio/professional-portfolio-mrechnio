@@ -1,0 +1,62 @@
+name: Deploy Portfolio
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual triggering from Actions tab
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    # Option A: Deploy to server via SSH + Git Pull
+    # Uncomment and configure if deploying to your own server
+    # - name: Setup SSH
+    #   uses: webfactory/ssh-agent@v0.7.0
+    #   with:
+    #     ssh-private-key: ${{ secrets.SSH_KEY }}
+    # 
+    # - name: Deploy via SSH
+    #   run: |
+    #     ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} << 'EOF'
+    #       cd ${{ secrets.DEPLOY_PATH }}
+    #       git pull origin main
+    #     EOF
+
+    # Option B: Deploy via rsync (copy files directly)
+    # Uncomment and configure if you prefer rsync
+    # - name: Setup SSH key
+    #   run: |
+    #     mkdir -p ~/.ssh
+    #     echo "${{ secrets.SSH_KEY }}" > ~/.ssh/deploy_key
+    #     chmod 600 ~/.ssh/deploy_key
+    #     ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+    # 
+    # - name: Deploy via rsync
+    #   run: |
+    #     rsync -avz --delete \
+    #       -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+    #       ./ ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.DEPLOY_PATH }}/
+
+    # Option C: Deploy via FTP (for shared hosting)
+    # Uncomment if using FTP
+    # - name: Deploy via FTP
+    #   uses: SamKirkland/FTP-Deploy-Action@4.3.0
+    #   with:
+    #     server: ${{ secrets.FTP_SERVER }}
+    #     username: ${{ secrets.FTP_USERNAME }}
+    #     password: ${{ secrets.FTP_PASSWORD }}
+    #     local-dir: ./
+    #     server-dir: /public_html/
+
+    # For now, just a placeholder that shows the workflow is working
+    - name: Deployment placeholder
+      run: |
+        echo "🚀 Deployment workflow triggered!"
+        echo "Configure your deployment method in .github/workflows/deploy.yml"
+        echo "See DEPLOYMENT.md for detailed instructions"

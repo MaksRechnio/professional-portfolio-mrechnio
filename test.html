@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Portfolio Diagnostic Test</title>
+</head>
+<body>
+    <h1>Portfolio Diagnostic Test</h1>
+    <div id="results"></div>
+    <script>
+        const results = document.getElementById('results');
+        const checks = [];
+        
+        // Check 1: Import maps support
+        if (HTMLScriptElement.supports && HTMLScriptElement.supports('importmap')) {
+            checks.push('✅ Import maps supported');
+        } else {
+            checks.push('❌ Import maps NOT supported (may need polyfill)');
+        }
+        
+        // Check 2: ES6 modules support
+        if ('noModule' in HTMLScriptElement.prototype) {
+            checks.push('✅ ES6 modules supported');
+        } else {
+            checks.push('❌ ES6 modules NOT supported');
+        }
+        
+        // Check 3: WebGL support
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (gl) {
+            checks.push('✅ WebGL supported');
+        } else {
+            checks.push('❌ WebGL NOT supported');
+        }
+        
+        // Check 4: File paths
+        const testPaths = [
+            'css/styles.css',
+            'js/script.js',
+            'images/mrech.png',
+            'images/white-plus-icon.png',
+            'favicons/black/favicon.ico'
+        ];
+        
+        testPaths.forEach(path => {
+            fetch(path, { method: 'HEAD' })
+                .then(() => checks.push(`✅ ${path} exists`))
+                .catch(() => checks.push(`❌ ${path} NOT FOUND`));
+        });
+        
+        setTimeout(() => {
+            results.innerHTML = '<h2>Test Results:</h2><ul>' + 
+                checks.map(check => `<li>${check}</li>`).join('') + 
+                '</ul>';
+        }, 1000);
+    </script>
+</body>
+</html>
+

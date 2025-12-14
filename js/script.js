@@ -1,15 +1,40 @@
 import * as THREE from 'three';
 
-// Scene setup
-const scene = new THREE.Scene();
-const container = document.getElementById('canvas-container');
-const containerRect = container.getBoundingClientRect();
+// Scene setup - variables declared at module level
+let scene, container, containerRect, camera, renderer;
+let mouse, mouseVelocity, mouseTrail, mouseClicks;
+let isHovering = false;
+let time = 0;
+let lastMouseTime = 0;
+let lastMousePos = new THREE.Vector2(0.5, 0.5);
 
-// Calculate aspect ratio to prevent horizontal compression
-const containerAspect = containerRect.width / containerRect.height;
-const camera = new THREE.OrthographicCamera(-containerAspect, containerAspect, 1, -1, 0, 1);
+// Global mouse position for picture and text movement
+let globalMouseX = 0.5;
+let globalMouseY = 0.5;
 
-const renderer = new THREE.WebGLRenderer({
+const textureLoader = new THREE.TextureLoader();
+let profileTexture;
+let shaderMaterial;
+
+// 100px width = 50px radius in normalized coordinates
+let revealRadiusNormalized = 0.15;
+
+// Wait for DOM to be ready before initializing
+function initMainScene() {
+    // Scene setup
+    scene = new THREE.Scene();
+    container = document.getElementById('canvas-container');
+    if (!container) {
+        console.error('Canvas container not found');
+        return;
+    }
+    containerRect = container.getBoundingClientRect();
+
+    // Calculate aspect ratio to prevent horizontal compression
+    const containerAspect = containerRect.width / containerRect.height;
+    camera = new THREE.OrthographicCamera(-containerAspect, containerAspect, 1, -1, 0, 1);
+
+    renderer = new THREE.WebGLRenderer({
     antialias: true,
     alpha: true,
     premultipliedAlpha: false
@@ -915,8 +940,16 @@ if (document.readyState === 'loading') {
 
 window.addEventListener('mousemove', onGlobalMouseMove);
 
-initTextures();
-animate();
+    initTextures();
+    animate();
+}
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMainScene);
+} else {
+    initMainScene();
+}
 
 // Quote Section Letter-by-Letter Animation
 function initQuoteAnimation() {
@@ -1104,9 +1137,7 @@ function initWaterfallAnimation() {
         'mentis-top-right.png',
         'onlylabs-bottom.png',
         'onlylabs-top.png',
-        'openline-left.png',
         'openline-middle.png',
-        'openline-right.png',
         'orrys-bottom-right.png',
         'orrys-left.png',
         'orrys-top-right.png',
@@ -1324,7 +1355,7 @@ function initThirdViewWebGL() {
         'exq-down.png', 'exq-middle-1.png', 'exq-middle-2.png', 'exq-top.png',
         'mentis-down-right.png', 'mentis-middle.png', 'mentis-top-left.png', 'mentis-top-right.png',
         'onlylabs-bottom.png', 'onlylabs-top.png',
-        'openline-left.png', 'openline-middle.png', 'openline-right.png',
+        'openline-middle.png',
         'orrys-bottom-right.png', 'orrys-left.png', 'orrys-top-right.png',
         'orrys-website.png',
         'overload-bottom-left.png', 'overload-bottom-right.png', 'overload-middle.png',
