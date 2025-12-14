@@ -1,10 +1,10 @@
 # Professional Portfolio - Maksymilian Rechnio
 
-A cutting-edge, interactive portfolio website showcasing UX/UI design work with advanced WebGL animations and Three.js-powered visual effects. This portfolio demonstrates expertise in creative web development, interactive design, and modern front-end techniques.
+A cutting-edge, interactive portfolio website showcasing UX/UI design work with advanced WebGL animations and Three.js-powered visual effects. My portfolio demonstrates expertise in creative web development, interactive design, and modern front-end techniques.
 
 ## 🎯 Project Overview
 
-This portfolio is a single-page application featuring multiple viewport sections with immersive 3D animations, custom shader effects, and interactive elements. The design emphasizes a minimalist aesthetic while showcasing technical capabilities through advanced WebGL implementations.
+This portfolio is a multipage application featuring multiple viewport sections with immersive 3D animations, custom shader effects, and interactive elements. The design emphasizes a minimalist aesthetic while showcasing technical capabilities through advanced WebGL implementations.
 
 ## ✨ Key Features
 
