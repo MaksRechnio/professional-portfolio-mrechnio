@@ -823,7 +823,7 @@ a, button, input, textarea, select, [role="button"] {
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1500px;
     align-items: start;
 }
 
@@ -835,9 +835,11 @@ a, button, input, textarea, select, [role="button"] {
     background-color: rgba(242, 242, 240, 0.05);
     cursor: none;
     --parallax-offset: 0px;
+    --mouse-offset-x: 0px;
+    --mouse-offset-y: 0px;
     --slide-offset: 100px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    transform: translateY(var(--parallax-offset)) translateX(var(--slide-offset));
+    transform: translateY(calc(var(--parallax-offset) + var(--mouse-offset-y))) translateX(calc(var(--slide-offset) + var(--mouse-offset-x)));
     opacity: 0;
 }
 
@@ -852,30 +854,30 @@ a, button, input, textarea, select, [role="button"] {
 
 @keyframes slidePopIn {
     0% {
-        transform: translateY(var(--parallax-offset)) translateX(100px) scale(0.8);
+        transform: translateY(calc(var(--parallax-offset) + var(--mouse-offset-y))) translateX(calc(100px + var(--mouse-offset-x))) scale(0.8);
         opacity: 0;
     }
     60% {
-        transform: translateY(var(--parallax-offset)) translateX(-8px) scale(1.02);
+        transform: translateY(calc(var(--parallax-offset) + var(--mouse-offset-y))) translateX(calc(-8px + var(--mouse-offset-x))) scale(1.02);
         opacity: 0.9;
     }
     100% {
-        transform: translateY(var(--parallax-offset)) translateX(0) scale(1);
+        transform: translateY(calc(var(--parallax-offset) + var(--mouse-offset-y))) translateX(var(--mouse-offset-x)) scale(1);
         opacity: 1;
     }
 }
 
 @keyframes slidePopOut {
     0% {
-        transform: translateY(var(--parallax-offset)) translateX(0) scale(1);
+        transform: translateY(calc(var(--parallax-offset) + var(--mouse-offset-y))) translateX(var(--mouse-offset-x)) scale(1);
         opacity: 1;
     }
     40% {
-        transform: translateY(var(--parallax-offset)) translateX(8px) scale(0.98);
+        transform: translateY(calc(var(--parallax-offset) + var(--mouse-offset-y))) translateX(calc(8px + var(--mouse-offset-x))) scale(0.98);
         opacity: 0.9;
     }
     100% {
-        transform: translateY(var(--parallax-offset)) translateX(100px) scale(0.8);
+        transform: translateY(calc(var(--parallax-offset) + var(--mouse-offset-y))) translateX(calc(100px + var(--mouse-offset-x))) scale(0.8);
         opacity: 0;
     }
 }
@@ -883,7 +885,7 @@ a, button, input, textarea, select, [role="button"] {
 /* Left column tiles with parallax */
 .project-tile-left {
     --slide-offset: 100px;
-    transform: translateY(var(--parallax-offset)) translateX(var(--slide-offset));
+    transform: translateY(calc(var(--parallax-offset) + var(--mouse-offset-y))) translateX(calc(var(--slide-offset) + var(--mouse-offset-x)));
     opacity: 0;
 }
 
@@ -898,30 +900,30 @@ a, button, input, textarea, select, [role="button"] {
 
 @keyframes slidePopInLeft {
     0% {
-        transform: translateY(var(--parallax-offset)) translateX(100px) scale(0.8);
+        transform: translateY(calc(var(--parallax-offset) + var(--mouse-offset-y))) translateX(calc(100px + var(--mouse-offset-x))) scale(0.8);
         opacity: 0;
     }
     60% {
-        transform: translateY(var(--parallax-offset)) translateX(-8px) scale(1.02);
+        transform: translateY(calc(var(--parallax-offset) + var(--mouse-offset-y))) translateX(calc(-8px + var(--mouse-offset-x))) scale(1.02);
         opacity: 0.9;
     }
     100% {
-        transform: translateY(var(--parallax-offset)) translateX(0) scale(1);
+        transform: translateY(calc(var(--parallax-offset) + var(--mouse-offset-y))) translateX(var(--mouse-offset-x)) scale(1);
         opacity: 1;
     }
 }
 
 @keyframes slidePopOutLeft {
     0% {
-        transform: translateY(var(--parallax-offset)) translateX(0) scale(1);
+        transform: translateY(calc(var(--parallax-offset) + var(--mouse-offset-y))) translateX(var(--mouse-offset-x)) scale(1);
         opacity: 1;
     }
     40% {
-        transform: translateY(var(--parallax-offset)) translateX(8px) scale(0.98);
+        transform: translateY(calc(var(--parallax-offset) + var(--mouse-offset-y))) translateX(calc(8px + var(--mouse-offset-x))) scale(0.98);
         opacity: 0.9;
     }
     100% {
-        transform: translateY(var(--parallax-offset)) translateX(100px) scale(0.8);
+        transform: translateY(calc(var(--parallax-offset) + var(--mouse-offset-y))) translateX(calc(100px + var(--mouse-offset-x))) scale(0.8);
         opacity: 0;
     }
 }

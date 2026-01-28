@@ -69,9 +69,9 @@ function calculateRevealRadius() {
     const containerRect = container.getBoundingClientRect();
     // Use width for horizontal, height for vertical - use the smaller to ensure it fits
     const minDimension = Math.min(containerRect.width, containerRect.height);
-    // Increased liquid bubble size: 140px wide = 140px radius (doubled from 70px)
-    revealRadiusNormalized = (100.0) / minDimension;
-    console.log('Reveal radius:', revealRadiusNormalized, 'for 140px radius, container:', containerRect.width, 'x', containerRect.height);
+    // Liquid bubble size: 150px wide = 150px radius (half of 300px)
+    revealRadiusNormalized = (150.0) / minDimension;
+    console.log('Reveal radius:', revealRadiusNormalized, 'for 150px radius, container:', containerRect.width, 'x', containerRect.height);
 }
 
 function initTextures() {
@@ -189,14 +189,46 @@ function createShaderMaterial() {
             return dotColor * dot;
         }
 
-        // Calculate distance to fluid stroke trail
+        // Create puzzle-like shape function - fully dynamic, no circular form
+        float puzzleShape(vec2 uv, vec2 center, float baseRadius, float age, vec2 trailPos) {
+            vec2 offset = uv - center;
+            float angle = atan(offset.y, offset.x);
+            float dist = length(offset);
+            
+            // Multiple noise layers for complex puzzle-like edges
+            float noise1 = noise(vec2(angle * 8.0, dist * 0.5) + trailPos * 15.0 + time * 2.0);
+            float noise2 = noise(vec2(angle * 12.0, dist * 0.8) + trailPos * 20.0 + time * 1.5);
+            float noise3 = noise(vec2(angle * 6.0, dist * 0.3) + trailPos * 10.0 + time * 2.5);
+            
+            // Combine noise layers for puzzle-piece protrusions and indentations
+            float puzzleVariation = (noise1 - 0.5) * 0.6 + (noise2 - 0.5) * 0.4 + (noise3 - 0.5) * 0.3;
+            
+            // Create angular variations for puzzle tabs and blanks
+            float angleVariation = sin(angle * 12.0 + time * 1.8) * 0.15 + 
+                                  cos(angle * 18.0 + time * 1.2) * 0.1 +
+                                  sin(angle * 7.0 + trailPos.x * 5.0) * 0.12;
+            
+            // Combine all variations for fully dynamic puzzle shape
+            float radiusVariation = puzzleVariation + angleVariation;
+            
+            // Base radius with age-based taper
+            float dynamicRadius = baseRadius * (1.0 - age * 0.2) * (1.0 + radiusVariation);
+            
+            // Add distance-based noise for organic edges
+            float edgeNoise = noise(uv * 25.0 + time * 3.0) * 0.08;
+            dynamicRadius += edgeNoise * baseRadius;
+            
+            // Return normalized distance (negative inside, positive outside)
+            return dist / dynamicRadius;
+        }
+        
+        // Calculate distance to fluid stroke trail with puzzle-like shape
         float distanceToTrail(vec2 uv) {
             float minDist = 999.0;
             
             // Check distance to current mouse position first (head of stroke)
-            float distToMouse = distance(uv, mousePosition);
-            float headRadius = revealRadius;
-            minDist = distToMouse / headRadius;
+            float headDist = puzzleShape(uv, mousePosition, revealRadius, 0.0, mousePosition);
+            minDist = headDist;
             
             // Then check trail segments (limit to actual count for performance)
             int maxCheck = trailCount < 15 ? trailCount : 15;
@@ -216,31 +248,14 @@ function createShaderMaterial() {
                 vec2 toPoint = uv - trailPos;
                 float t = clamp(dot(toPoint, lineDir) / (lineLen * lineLen), 0.0, 1.0);
                 vec2 closestPoint = trailPos + lineDir * t;
-                float dist = distance(uv, closestPoint);
                 
                 // Fade based on age (older points fade out)
                 float age = trailTimes[i];
                 float ageFade = smoothstep(1.0, 0.3, age); // Fade out over 1 second
                 
-                // Add dynamic turbulence to thickness for more fluid-like behavior
-                float noiseValue = noise(trailPos * 12.0 + time * 1.5);
-                float turbulence = (noiseValue - 0.5) * 0.4; // -0.2 to 0.2 variation
-                
-                // Add position-based turbulence for unpredictable shape
-                vec2 turbulenceOffset = vec2(
-                    noise(trailPos * 10.0 + time * 1.0) - 0.5,
-                    noise(trailPos * 10.0 + time * 1.0 + vec2(100.0)) - 0.5
-                ) * 0.06 * (1.0 - age * 0.3);
-                
-                // Make stroke wider with dynamic thickness - thicker at head, slightly thinner at tail
-                // Base radius is revealRadius (50px = 100px wide)
-                float baseThickness = revealRadius * (1.0 - age * 0.2); // Slight taper
-                float thickness = baseThickness * (1.0 + turbulence); // Dynamic width variation
-                
-                // Apply turbulence to position
-                vec2 turbulentPoint = closestPoint + turbulenceOffset;
-                float turbulentDist = distance(uv, turbulentPoint);
-                float normalizedDist = turbulentDist / thickness;
+                // Use puzzle shape function instead of circular distance
+                float puzzleDist = puzzleShape(uv, closestPoint, revealRadius, age, trailPos);
+                float normalizedDist = puzzleDist;
                 
                 // Only consider if within stroke and not faded out
                 if (normalizedDist < 1.0 && ageFade > 0.01) {
