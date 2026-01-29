@@ -19,6 +19,10 @@ let shaderMaterial;
 // 100px width = 50px radius in normalized coordinates
 let revealRadiusNormalized = 0.15;
 
+// Track connection state for smooth collapse
+let lastConnectionState = false;
+let disconnectTimeValue = -1.0;
+
 // Wait for DOM to be ready before initializing
 function initMainScene() {
     // Scene setup
@@ -110,6 +114,7 @@ function createShaderMaterial() {
         uniform int clickCount;
         uniform bool isHovering;
         uniform float time;
+        uniform float disconnectTime;
         uniform vec2 resolution;
         uniform float revealRadius;
         varying vec2 vUv;
@@ -220,6 +225,55 @@ function createShaderMaterial() {
             
             // Return normalized distance (negative inside, positive outside)
             return dist / dynamicRadius;
+        }
+        
+        // Check if a point on the trail touches the silhouette
+        float getPointConnectionStrength(vec2 point, float sampleRadius) {
+            // Check center point
+            vec4 centerColor = texture2D(profileTexture, point);
+            if (centerColor.a > 0.1) {
+                return 1.0;
+            }
+            
+            // Sample multiple points around the trail point to check if any touch silhouette
+            int samples = 12;
+            float maxConnection = 0.0;
+            for (int i = 0; i < samples; i++) {
+                float angle = float(i) * 6.28318 / float(samples); // 2*PI
+                vec2 offset = vec2(cos(angle), sin(angle)) * sampleRadius;
+                vec2 samplePoint = point + offset;
+                vec4 sampleColor = texture2D(profileTexture, samplePoint);
+                float distFactor = 1.0 - length(offset) / sampleRadius; // Closer = stronger
+                maxConnection = max(maxConnection, sampleColor.a * distFactor);
+            }
+            
+            return smoothstep(0.05, 0.15, maxConnection);
+        }
+        
+        // Check if any part of the trail still connects to silhouette
+        float getTrailConnectionStrength() {
+            float connectionStrength = 0.0;
+            
+            // Check current mouse position with larger radius for better detection
+            float mouseConnection = getPointConnectionStrength(mousePosition, revealRadius * 0.8);
+            connectionStrength = max(connectionStrength, mouseConnection);
+            
+            // Check trail segments
+            int maxCheck = trailCount < 15 ? trailCount : 15;
+            for (int i = 0; i < maxCheck; i++) {
+                if (i >= trailCount) break;
+                
+                vec2 trailPos = mouseTrail[i];
+                float age = trailTimes[i];
+                float ageFade = smoothstep(1.0, 0.3, age);
+                
+                if (ageFade > 0.01) {
+                    float pointConnection = getPointConnectionStrength(trailPos, revealRadius * 0.8);
+                    connectionStrength = max(connectionStrength, pointConnection * ageFade);
+                }
+            }
+            
+            return connectionStrength;
         }
         
         // Calculate distance to fluid stroke trail with puzzle-like shape
@@ -469,29 +523,79 @@ function createShaderMaterial() {
                 // Very smooth transition for seamless fluid effect
                 float strokeMask = 1.0 - smoothstep(0.5, 1.0, combinedDist);
                 
-                // CRITICAL: Only reveal dots where stroke exists AND within silhouette
-                // This prevents showing dots outside the silhouette outline
-                if (strokeMask > 0.01 && profileColor.a > 0.1) {
-                    // Generate animated dots (white and black)
-                    vec3 dots = animatedDots(vUv);
-                    
-                    // Background color (#0C042D = rgb(12, 4, 45)) with 30% opacity
-                    vec3 bgColor = vec3(12.0/255.0, 4.0/255.0, 45.0/255.0);
-                    
-                    // Mix background with dots - dots already contain their colors
-                    float dotIntensity = length(dots);
-                    vec3 fluidRGB = mix(bgColor, dots, dotIntensity);
-                    float fluidAlpha = profileColor.a * strokeMask * 0.3; // 30% opacity
-                    
-                    // Composite layers: shadow (base) + fluid (on top)
-                    // Shadow stays visible by compositing fluid on top of shadow
-                    finalColor.rgb = mix(shadowLayer.rgb, fluidRGB, fluidAlpha);
-                    finalColor.a = shadowAlpha + fluidAlpha * (1.0 - shadowAlpha); // Proper alpha blending
+                // Check if trail still connects to silhouette
+                float connectionStrength = getTrailConnectionStrength();
+                
+                // Time-based collapse: smooth, gradual fade when connection is lost
+                float collapseFade = 1.0;
+                
+                // If currently connected (strong connection), keep fade at full
+                if (connectionStrength > 0.15) {
+                    collapseFade = 1.0;
+                } else if (connectionStrength > 0.05) {
+                    // Weak connection - start fading but keep some visibility
+                    collapseFade = smoothstep(0.05, 0.15, connectionStrength);
                 } else {
-                    // Draw silhouette on top of shadow (outside stroke area)
+                    // No connection - use time-based decay for smooth collapse
+                    // disconnectTime is set when connection is lost, fade over 2.0 seconds for smooth collapse
+                    float timeSinceDisconnect = time - disconnectTime;
+                    float collapseDuration = 2.0; // 2.0 seconds for smooth, slow collapse
+                    
+                    // Only start collapse timer if disconnectTime is valid (>= 0)
+                    if (disconnectTime >= 0.0) {
+                        // Smooth fade out using ease-out curve
+                        float collapseProgress = clamp(timeSinceDisconnect / collapseDuration, 0.0, 1.0);
+                        // Use smoothstep for ultra-smooth easing with ease-out curve
+                        collapseFade = 1.0 - smoothstep(0.0, 1.0, collapseProgress);
+                        // Apply additional smoothing for extra smoothness
+                        collapseFade = smoothstep(0.0, 1.0, collapseFade);
+                    } else {
+                        // If disconnectTime not set yet, use connection strength directly
+                        collapseFade = connectionStrength * 2.0;
+                    }
+                    
+                    // Ensure fade doesn't go negative
+                    collapseFade = max(collapseFade, 0.0);
+                }
+                
+                strokeMask *= collapseFade;
+                
+                // Check if current pixel is inside or outside silhouette
+                bool isInsideSilhouette = profileColor.a > 0.1;
+                
+                // Render fluid if stroke mask is active
+                if (strokeMask > 0.01) {
+                    if (isInsideSilhouette) {
+                        // Inside silhouette: black dots on background
+                        vec3 dots = animatedDots(vUv);
+                        // Make dots black inside silhouette
+                        float dotIntensity = length(dots);
+                        vec3 blackDots = vec3(0.0, 0.0, 0.0) * dotIntensity;
+                        
+                        // Background color (#0C042D = rgb(12, 4, 45)) with 30% opacity
+                        vec3 bgColor = vec3(12.0/255.0, 4.0/255.0, 45.0/255.0);
+                        
+                        // Mix background with black dots
+                        vec3 fluidRGB = mix(bgColor, blackDots, dotIntensity);
+                        float fluidAlpha = profileColor.a * strokeMask * 0.3; // 30% opacity
+                        
+                        // Composite layers: shadow (base) + fluid (on top)
+                        finalColor.rgb = mix(shadowLayer.rgb, fluidRGB, fluidAlpha);
+                        finalColor.a = shadowAlpha + fluidAlpha * (1.0 - shadowAlpha);
+                    } else {
+                        // Outside silhouette: white fluid
+                        vec3 whiteFluid = vec3(1.0, 1.0, 1.0);
+                        float fluidAlpha = strokeMask * 0.5; // White fluid opacity
+                        
+                        // Composite white fluid on top of shadow
+                        finalColor.rgb = mix(shadowLayer.rgb, whiteFluid, fluidAlpha);
+                        finalColor.a = shadowAlpha + fluidAlpha * (1.0 - shadowAlpha);
+                    }
+                } else {
+                    // Draw silhouette on top of shadow (outside stroke area or collapsed)
                     if (profileColor.a > 0.1) {
                         finalColor.rgb = mix(shadowLayer.rgb, profileColor.rgb, profileColor.a);
-                        finalColor.a = shadowAlpha + profileColor.a * (1.0 - shadowAlpha); // Keep shadow visible
+                        finalColor.a = shadowAlpha + profileColor.a * (1.0 - shadowAlpha);
                     }
                 }
             } else {
@@ -527,6 +631,7 @@ function createShaderMaterial() {
             clickCount: { value: 0 },
             isHovering: { value: false },
             time: { value: 0 },
+            disconnectTime: { value: -1.0 },
             resolution: { value: new THREE.Vector2(containerRect.width, containerRect.height) },
             revealRadius: { value: revealRadiusNormalized }
         },
@@ -650,8 +755,11 @@ function onMouseMove(event) {
 function onMouseEnter() {
     isHovering = true;
     lastMouseTime = time;
+    lastConnectionState = false; // Reset connection state
+    disconnectTimeValue = -1.0; // Reset disconnect time
     if (shaderMaterial) {
         shaderMaterial.uniforms.isHovering.value = true;
+        shaderMaterial.uniforms.disconnectTime.value = -1.0;
     }
 }
 
@@ -661,6 +769,7 @@ function onMouseLeave() {
     lastMousePos.set(0.5, 0.5);
     mouseTrail.length = 0; // Clear trail
     mouseVelocity.set(0, 0);
+    lastConnectionState = false;
     
     // Reset picture position and rotation targets
     if (window.interactiveMesh) {
@@ -672,6 +781,9 @@ function onMouseLeave() {
         shaderMaterial.uniforms.isHovering.value = false;
         shaderMaterial.uniforms.mousePosition.value.set(0.5, 0.5);
         shaderMaterial.uniforms.trailCount.value = 0;
+        // Set disconnect time when leaving
+        disconnectTimeValue = time;
+        shaderMaterial.uniforms.disconnectTime.value = time;
     }
 }
 
@@ -717,6 +829,54 @@ function animate() {
     
     if (shaderMaterial) {
         shaderMaterial.uniforms.time.value = time;
+        
+        // Check connection state - use a delay before marking as disconnected
+        // This allows the fluid to persist even when cursor briefly leaves silhouette
+        let isConnected = false;
+        if (isHovering && profileTexture && renderer) {
+            // Check if mouse is in a reasonable area (silhouette is roughly centered)
+            // The silhouette is typically in the center area
+            const distFromCenter = Math.sqrt(
+                Math.pow(mouse.x - 0.5, 2) + Math.pow(mouse.y - 0.5, 2)
+            );
+            
+            // If mouse is close to center area, consider it potentially connected
+            // Also check if we have recent trail points (within last 0.5 seconds)
+            const hasRecentTrail = mouseTrail.length > 0 && 
+                mouseTrail.some(point => (time - point.time) < 0.5);
+            
+            // Consider connected if mouse is in center area OR has recent trail
+            // This allows fluid to persist when cursor moves outside but trail still connects
+            if (distFromCenter < 0.45 || hasRecentTrail) {
+                isConnected = true;
+            }
+        }
+        
+        // Update disconnect time when connection state changes
+        // Use a small delay before marking as disconnected to allow smooth transition
+        if (isConnected) {
+            // Connected - reset disconnect time if it was set
+            if (disconnectTimeValue >= 0) {
+                disconnectTimeValue = -1.0;
+                shaderMaterial.uniforms.disconnectTime.value = -1.0;
+            }
+            lastConnectionState = true;
+        } else if (isHovering) {
+            // Not connected but still hovering - check if we should set disconnect time
+            if (lastConnectionState) {
+                // Just disconnected - set disconnect time to current time
+                disconnectTimeValue = time;
+                shaderMaterial.uniforms.disconnectTime.value = time;
+            } else if (disconnectTimeValue < 0) {
+                // Already disconnected, ensure disconnect time is set
+                disconnectTimeValue = time;
+                shaderMaterial.uniforms.disconnectTime.value = time;
+            }
+            lastConnectionState = false;
+        } else {
+            // Not hovering - reset state
+            lastConnectionState = false;
+        }
         
         // Update click times for ripple animation
         if (mouseClicks.length > 0) {
